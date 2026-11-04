@@ -28,7 +28,7 @@ Nothing looks wrong. The logs show no error, the job ends with success, the serv
 
 ## Mechanism
 
-**The failure signal is turned into a valid value.** At the failing line the code knows something went wrong; a handler converts that into a value of the normal type, with no bit that says it is a stand-in. An empty list reads as no results (INC-201), and so would the empty list a handler returns once a changed model no longer matches its index's dimensions, which an audit found before it fired (INC-202); a local count reads as a counted like (INC-205), `None` from a factory reads as nothing to check (INC-211, private), a returned "no collision" from an uncalibrated check reads as clear (INC-212, private). Each layer can be reasonable on its own; stacked, they launder an infrastructure failure into a success the caller reports.
+**The failure signal is turned into a valid value.** At the failing line the code knows something went wrong; a handler converts that into a value of the normal type, with no bit that says it is a stand-in. An empty list reads as no results (INC-201); a local count reads as a counted like (INC-205), `None` from a factory reads as nothing to check (INC-211, private), a returned "no collision" from an uncalibrated check reads as clear (INC-212, private). INC-202 is the same hole, found by an audit before it fired: had the embedding model been switched to one with larger vectors, the vector search would have failed on the size mismatch, and its handler would have returned an empty list for every query. Each layer can be reasonable on its own; stacked, they launder an infrastructure failure into a success the caller reports.
 
 **A missing input is treated as a feature switched off.** A missing id or an uncalibrated sensor is handled as a feature that is off rather than as a fault (INC-205; INC-212, private). Nothing in the code marks the empty case as a fault; it runs down the same path as the off case, and the fallback it lands on looks like normal output.
 
@@ -40,7 +40,7 @@ Nothing looks wrong. The logs show no error, the job ends with success, the serv
 
 **Agents add the fallback.** A study of automated issue solving names "evasive repair": the tool treats a symptom with defensive code such as a broad try-except or a null check, and "This prevents crashes but masks root causes." ([Liu et al.](https://arxiv.org/html/2509.13941)). A practitioner rule set for LLM-written Python says "Many models overuse broad try and except blocks, and one of the most problematic variants is catching every exception and ignoring it entirely." ([Dagster](https://dagster.io/blog/dignified-python-10-rules-to-improve-your-llm-agents)). Anthropic's prompting guide notes that some Claude models overengineer and suggests a sample prompt: "Don't add error handling, fallbacks, or validation for scenarios that can't happen." ([Claude prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)). Two public reports show the rule in an instruction file not holding: the agent added fallbacks the file forbade (INC-214), and after a plan built under a fail-fast, no-fallback policy it reported an automatic fallback chain as a feature (INC-215).
 
-**Fixes move the failure.** Making one site loud often leaves its sibling quiet, and making it fail closed can block legitimate work. In the maintainer's record, fixes that made a site report its failure moved the failure elsewhere in all three cases, and per-site fail-closed fixes with a pinning test held at their site but left a sibling site open in all six cases (as of 2026-10, one operator's audit, private, not verifiable). One soft-fail was right by design for a transient failure and wrong for a permanent one: a like must not fail because a spreadsheet was slow, but the same catch also swallowed an error that meant the counter could never work (INC-206).
+**Fixes move the failure.** Making one site loud often leaves its sibling quiet, and making it fail closed can block legitimate work. In the maintainer's record (the incidents from the maintainer's own repositories, and one operator's audit of 12 of them; see Evidence), fixes that made a site report its failure moved the failure elsewhere in all three cases, and per-site fail-closed fixes with a pinning test held at their site but left a sibling site open in all six cases (as of 2026-10, one operator's audit, private, not verifiable). One soft-fail was right by design for a transient failure and wrong for a permanent one: a like must not fail because a spreadsheet was slow, but the same catch also swallowed an error that meant the counter could never work (INC-206).
 
 ## Where it surfaces
 
@@ -48,7 +48,7 @@ More than half the rows were found after merge: in 9 of this class's 16 dataset 
 
 ## Protections
 
-Ordered by where they act, from the agent's prompt through the code and its tests to checks that run outside the code; within that, cheapest first. The rungs in code catch a fallback before it ships; the outside checks catch the ones that shipped anyway, and are the ones that can see a process that stopped. None of them replaces the ones before.
+Ordered from the cheapest rung to the strongest. The rungs that act on the code catch a fallback before it ships; the checks that run outside it catch the ones that shipped anyway, and are the ones that can see a process that stopped. No rung replaces another.
 
 ### Prompt: tell the agent to fail loudly and add no fallback
 
@@ -66,7 +66,7 @@ Ordered by where they act, from the agent's prompt through the code and its test
 
 - **Source:** Anthropic ships a review agent for "silent failures, inadequate error handling, and inappropriate fallback behavior" ([silent-failure-hunter](https://github.com/anthropics/claude-plugins-official/blob/main/plugins/pr-review-toolkit/agents/silent-failure-hunter.md)); a vendor report on AI-co-authored pull requests lists "Standardize exception-handling rules" among its safety rails and "Are error paths covered?" in its review checklist ([CodeRabbit](https://www.coderabbit.ai/blog/state-of-ai-vs-human-code-generation-report)).
 - **Cost:** tokens per pull request, and the time to triage its findings.
-- **Breaks when:** the fallback is in code the diff does not touch, or in a sibling of the fixed site; the reviewer accepts a documented fallback as intended. No catch rate for such a pass is published.
+- **Breaks when:** the fallback is in code the diff does not touch, which a pass over the pull request does not read; or it is in a sibling of the fixed site, as it was after all six per-site fail-closed fixes in the maintainer's record (as of 2026-10, one operator's audit, private, not verifiable); or the reviewer accepts a documented fallback as intended. No catch rate for such a pass is published.
 
 ### Startup: refuse to start without required configuration
 
@@ -74,28 +74,10 @@ Ordered by where they act, from the agent's prompt through the code and its test
 - **Cost:** a schema per service.
 - **Breaks when:** the schema gives the field a default, an edit an agent can make to fix a startup crash; the value is present but wrong (a model name that would no longer match its index, INC-202); or the code reads configuration outside the schema.
 
-### Tests: inject the failure and assert the caller sees it
-
-- **Source:** most catastrophic failures in five distributed systems came from wrong handling of errors the software had signalled, and simple tests of the error-handling code would have found many of them ([Yuan et al., OSDI 2014](https://www.usenix.org/conference/osdi14/technical-sessions/presentation/yuan)). Agent pull requests leave error-handling code the least covered ([Dipongkor et al.](https://arxiv.org/abs/2607.18057)).
-- **Cost:** hours per failure path, and a fake or fault injector for each dependency.
-- **Breaks when:** the test asserts the fallback value as the expected result, so it pins the silence; or it covers the fixed site and not its siblings. In the maintainer's record, per-site fixes pinned by a test held at their site in all six cases and left a sibling open in each (as of 2026-10, one operator's audit, private, not verifiable).
-
-### Errors: send them where a person reads them, and count them
-
-- **Source:** one operator's practice: every error and every fallback taken goes to the channel a person already reads (the app's own log screen, a chat alert), and a count of fallbacks per day is watched. INC-207 logged to a debug channel a user never sees; INC-200 lost its error's text to a quiet flag, and its alert classifier had no pattern for that error.
-- **Cost:** a sink per app and the attention to read it.
-- **Breaks when:** the channel is noisy enough that people stop reading it, or a new code path logs to the old place.
-
-### Design: avoid the fallback, or run it constantly and alarm on its rate
-
-- **Source:** "To begin with, fallback logic is hard to test." and "If fallback is essential in a system, we exercise it as often as possible in production"; for retries, "we maintain metrics that monitor overall retry rates and alarms that alert our teams if retries are happening frequently." ([AWS, avoiding fallback](https://aws.amazon.com/builders-library/avoiding-fallback-in-distributed-systems/)). Where degrading is the right call, returning a typed "unavailable" result instead of a normal-looking value is one operator's practice.
-- **Cost:** engineering time; metrics and an alarm per fallback.
-- **Breaks when:** a fallback emits no metric, so how often it fires is unknown; or the caller converts the typed result back into a default.
-
 ### Heartbeat: an external dead man's switch per scheduled job
 
 - **Source:** "It raises an alert as soon as a ping does not arrive on time." ([Healthchecks.io](https://healthchecks.io/docs/)); [Sentry Crons](https://docs.sentry.io/product/crons/job-monitoring/) does the same. [Absence read as success](absence-read-as-success.md) uses the same rung for checks that run on a schedule.
-- **Cost:** free for 20 monitored jobs (as of 2026-10, [Healthchecks.io pricing](https://healthchecks.io/pricing/)); an hour of setup per job.
+- **Cost:** free for 20 monitored jobs (as of 2026-10, [Healthchecks.io pricing](https://healthchecks.io/pricing/)); setup time per job.
 - **Breaks when:** a job is never registered: INC-204 failed for 12 weeks with nothing watching its outcome, and in the maintainer's record an alarm held for the job it watched while a sibling job went unwatched (as of 2026-10, one operator's audit, private, not verifiable); the ping is sent whether or not the job succeeded; or the job is alive and its output is wrong. A watchdog inside the process is no substitute; in INC-203 the only checks ran inside the process, and the external restart setting itself failed.
 
 ### Missing data: alert when a series stops arriving
@@ -109,6 +91,24 @@ Ordered by where they act, from the agent's prompt through the code and its test
 - **Source:** an always-firing Watchdog alert that an external receiver expects, so a dead alerting pipeline is itself noticed ([Prometheus Operator runbook](https://runbooks.prometheus-operator.dev/runbooks/general/watchdog/)). A monitor that runs as a scheduled workflow can be switched off by the platform itself; [absence read as success](absence-read-as-success.md) has the GitHub case.
 - **Cost:** one alert rule and an external receiver.
 - **Breaks when:** the receiver shares a failure with the thing it watches, or nobody is paged when the watchdog goes quiet.
+
+### Errors: send them where a person reads them, and count them
+
+- **Source:** one operator's practice: every error and every fallback taken goes to the channel a person already reads (the app's own log screen, a chat alert), and a count of fallbacks per day is watched. INC-207 logged to a debug channel a user never sees; INC-200 lost its error's text to a quiet flag, and its alert classifier had no pattern for that error.
+- **Cost:** a sink per app and the attention to read it.
+- **Breaks when:** the channel carries so much that a real error is lost in it: when pages come too often, people "second-guess, skim, or even ignore incoming alerts" ([Google SRE, ch. 6](https://sre.google/sre-book/monitoring-distributed-systems/)); or a new code path logs to the old place.
+
+### Tests: inject the failure and assert the caller sees it
+
+- **Source:** most catastrophic failures in five distributed systems came from wrong handling of errors the software had signalled, and simple tests of the error-handling code would have found many of them ([Yuan et al., OSDI 2014](https://www.usenix.org/conference/osdi14/technical-sessions/presentation/yuan)). Agent pull requests leave error-handling code the least covered ([Dipongkor et al.](https://arxiv.org/abs/2607.18057)).
+- **Cost:** hours per failure path, and a fake or fault injector for each dependency.
+- **Breaks when:** the test asserts the fallback value as the expected result, so it pins the silence; or it covers the fixed site and not its siblings. In the maintainer's record, per-site fixes pinned by a test held at their site in all six cases and left a sibling open in each (as of 2026-10, one operator's audit, private, not verifiable).
+
+### Design: avoid the fallback, or run it constantly and alarm on its rate
+
+- **Source:** "To begin with, fallback logic is hard to test." and "If fallback is essential in a system, we exercise it as often as possible in production"; for retries, "we maintain metrics that monitor overall retry rates and alarms that alert our teams if retries are happening frequently." ([AWS, avoiding fallback](https://aws.amazon.com/builders-library/avoiding-fallback-in-distributed-systems/)). Where degrading is the right call, returning a typed "unavailable" result instead of a normal-looking value is one operator's practice.
+- **Cost:** engineering time; metrics and an alarm per fallback.
+- **Breaks when:** a fallback emits no metric, so how often it fires is unknown; or the caller converts the typed result back into a default.
 
 ### Content: probe the output from outside and check it is right
 
