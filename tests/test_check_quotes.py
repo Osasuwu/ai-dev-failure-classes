@@ -36,20 +36,30 @@ def _doc(tmp_path: Path, body: str) -> Path:
     return path
 
 
-def _verdicts(tmp_path: Path, body: str, pages: dict[str, str]) -> list[tuple[str, str]]:
-    return [(q.text, v) for q, v, _ in check(_doc(tmp_path, body), fetch=_fetcher(pages))]
+def _verdicts(
+    tmp_path: Path, body: str, pages: dict[str, str]
+) -> list[tuple[str, str]]:
+    return [
+        (q.text, v) for q, v, _ in check(_doc(tmp_path, body), fetch=_fetcher(pages))
+    ]
 
 
 # --- extraction --------------------------------------------------------------
 
 
 def test_extracts_quote_with_its_paragraph_links():
-    quotes = extract_quotes('The [docs](https://a.example) say "exit code two blocks".\n')
-    assert [(q.text, q.urls) for q in quotes] == [("exit code two blocks", ("https://a.example",))]
+    quotes = extract_quotes(
+        'The [docs](https://a.example) say "exit code two blocks".\n'
+    )
+    assert [(q.text, q.urls) for q in quotes] == [
+        ("exit code two blocks", ("https://a.example",))
+    ]
 
 
 def test_quote_spanning_lines_is_joined_and_reported_at_its_first_line():
-    text = 'Intro line.\nIt says "exit code\ntwo blocks" per [docs](https://a.example).\n'
+    text = (
+        'Intro line.\nIt says "exit code\ntwo blocks" per [docs](https://a.example).\n'
+    )
     [quote] = extract_quotes(text)
     assert quote.text == "exit code two blocks"
     assert quote.line == 2
@@ -68,13 +78,17 @@ def test_skips_frontmatter():
 
 
 def test_paragraph_without_links_falls_back_to_previous_paragraph():
-    text = 'See [docs](https://a.example).\n\nThe same page says "exit code two blocks".\n'
+    text = (
+        'See [docs](https://a.example).\n\nThe same page says "exit code two blocks".\n'
+    )
     [quote] = extract_quotes(text)
     assert quote.urls == ("https://a.example",)
 
 
 def test_bare_url_counts_as_a_link():
-    [quote] = extract_quotes('It says "exit code two blocks" (https://a.example/page).\n')
+    [quote] = extract_quotes(
+        'It says "exit code two blocks" (https://a.example/page).\n'
+    )
     assert quote.urls == ("https://a.example/page",)
 
 
@@ -112,14 +126,19 @@ def test_paraphrase_does_not_match():
 
 def test_found(tmp_path):
     body = 'The [docs](https://a.example) say "exit code two blocks".'
-    assert _verdicts(tmp_path, body, {"https://a.example": "exit code two blocks it"}) == [
-        ("exit code two blocks", "found")
-    ]
+    assert _verdicts(
+        tmp_path, body, {"https://a.example": "exit code two blocks it"}
+    ) == [("exit code two blocks", "found")]
 
 
 def test_not_found_when_every_credited_page_was_fetched_and_lacks_the_text(tmp_path):
-    body = 'See [a](https://a.example) and [b](https://b.example): "exit code two blocks".'
-    pages = {"https://a.example": "exit code 2 blocks", "https://b.example": "nothing relevant"}
+    body = (
+        'See [a](https://a.example) and [b](https://b.example): "exit code two blocks".'
+    )
+    pages = {
+        "https://a.example": "exit code 2 blocks",
+        "https://b.example": "nothing relevant",
+    }
     assert _verdicts(tmp_path, body, pages) == [("exit code two blocks", "NOT FOUND")]
 
 
@@ -128,8 +147,13 @@ def test_found_elsewhere_flags_a_quote_credited_to_the_wrong_page(tmp_path):
         'Tool A [docs](https://a.example) say "exit code two blocks".\n\n'
         "Tool B has [its own docs](https://b.example)."
     )
-    pages = {"https://a.example": "nothing relevant", "https://b.example": "exit code two blocks"}
-    assert _verdicts(tmp_path, body, pages) == [("exit code two blocks", "found elsewhere")]
+    pages = {
+        "https://a.example": "nothing relevant",
+        "https://b.example": "exit code two blocks",
+    }
+    assert _verdicts(tmp_path, body, pages) == [
+        ("exit code two blocks", "found elsewhere")
+    ]
 
 
 def test_no_source(tmp_path):
@@ -139,16 +163,22 @@ def test_no_source(tmp_path):
 
 
 def test_unfetchable_when_no_linked_page_can_be_fetched(tmp_path):
-    body = 'See [a](https://a.example) and [b](https://b.example): "exit code two blocks".'
+    body = (
+        'See [a](https://a.example) and [b](https://b.example): "exit code two blocks".'
+    )
     assert _verdicts(tmp_path, body, {}) == [("exit code two blocks", "unfetchable")]
 
 
 def test_unfetchable_when_one_credited_page_failed_and_the_fetched_one_lacks_the_text(
     tmp_path, capsys
 ):
-    body = 'See [a](https://a.example) and [b](https://b.example): "exit code two blocks".'
+    body = (
+        'See [a](https://a.example) and [b](https://b.example): "exit code two blocks".'
+    )
     doc = _doc(tmp_path, body)
-    [(_, verdict, unfetched)] = check(doc, fetch=_fetcher({"https://a.example": "nothing"}))
+    [(_, verdict, unfetched)] = check(
+        doc, fetch=_fetcher({"https://a.example": "nothing"})
+    )
     assert (verdict, unfetched) == ("unfetchable", ("https://b.example",))
     assert main([str(doc)], fetch=_fetcher({"https://a.example": "nothing"})) == 0
     out = capsys.readouterr().out
@@ -163,7 +193,9 @@ def test_near_empty_page_is_unfetchable_not_a_mismatch(tmp_path):
 
 
 def test_relative_link_reads_the_local_file(tmp_path):
-    (tmp_path / "other.md").write_text("It says: exit code two blocks.\n", encoding="utf-8")
+    (tmp_path / "other.md").write_text(
+        "It says: exit code two blocks.\n", encoding="utf-8"
+    )
     body = 'The [other doc](other.md#part) says "exit code two blocks".'
     assert _verdicts(tmp_path, body, {}) == [("exit code two blocks", "found")]
 
@@ -172,7 +204,10 @@ def test_main_exits_1_on_not_found_and_0_otherwise(tmp_path, capsys):
     doc = _doc(tmp_path, 'The [docs](https://a.example) say "exit code two blocks".')
     assert main([str(doc)], fetch=_fetcher({"https://a.example": "other"})) == 1
     assert 'NOT FOUND: "exit code two blocks"' in capsys.readouterr().out
-    assert main([str(doc)], fetch=_fetcher({"https://a.example": "exit code two blocks"})) == 0
+    assert (
+        main([str(doc)], fetch=_fetcher({"https://a.example": "exit code two blocks"}))
+        == 0
+    )
     assert main([]) == 2
 
 
@@ -187,7 +222,9 @@ def test_fallback_is_only_the_paragraph_right_before(tmp_path):
 
 
 def test_a_heading_breaks_the_fallback():
-    [quote] = extract_quotes('See [docs](https://a.example).\n\n## Next\n\nIt says "a b c".\n')
+    [quote] = extract_quotes(
+        'See [docs](https://a.example).\n\n## Next\n\nIt says "a b c".\n'
+    )
     assert quote.urls == ()
 
 
@@ -201,20 +238,22 @@ def test_binary_local_link_is_unfetchable_not_a_crash(tmp_path):
 
 def test_quote_across_blockquote_lines(tmp_path):
     body = 'The [docs](https://a.example) say:\n> "exit code\n> two blocks the call"'
-    assert _verdicts(tmp_path, body, {"https://a.example": "exit code two blocks the call"}) == [
-        ("exit code two blocks the call", "found")
-    ]
+    assert _verdicts(
+        tmp_path, body, {"https://a.example": "exit code two blocks the call"}
+    ) == [("exit code two blocks the call", "found")]
 
 
 def test_url_with_parentheses_link_title_anchor_and_comment():
     text = (
-        "<!-- a note \"not a quote at all\" -->\n"
+        '<!-- a note "not a quote at all" -->\n'
         '[wiki](https://w.example/Foo_(bar) "Docs Page Title Here") and [above](#x)'
         ' say "exit code two blocks".\n'
     )
     [quote] = extract_quotes(text)
     assert (quote.text, quote.urls, quote.line) == (
-        "exit code two blocks", ("https://w.example/Foo_(bar)",), 2
+        "exit code two blocks",
+        ("https://w.example/Foo_(bar)",),
+        2,
     )
 
 
@@ -243,14 +282,18 @@ def test_line_number_ignores_words_inside_a_comment():
 # --- CI check (#98) -------------------------------------------------------------
 
 
-def test_ci_not_found_exits_nonzero_and_summary_counts_it(tmp_path, capsys, monkeypatch):
+def test_ci_not_found_exits_nonzero_and_summary_counts_it(
+    tmp_path, capsys, monkeypatch
+):
     monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
     doc = _doc(tmp_path, 'The [docs](https://a.example) say "exit code two blocks".')
     assert main([str(doc)], fetch=_fetcher({"https://a.example": "other"})) == 1
     assert "1 NOT FOUND" in capsys.readouterr().out
 
 
-def test_ci_unfetchable_only_exits_zero_and_prints_the_count(tmp_path, capsys, monkeypatch):
+def test_ci_unfetchable_only_exits_zero_and_prints_the_count(
+    tmp_path, capsys, monkeypatch
+):
     summary = tmp_path / "summary.md"
     monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(summary))
     body = (
@@ -266,9 +309,13 @@ def test_ci_unfetchable_only_exits_zero_and_prints_the_count(tmp_path, capsys, m
 
 def test_ci_unfetchable_source_is_counted_once_across_quotes_and_docs(tmp_path, capsys):
     one = tmp_path / "one.md"
-    one.write_text('[a](https://a.example) says "exit code two blocks".\n', encoding="utf-8")
+    one.write_text(
+        '[a](https://a.example) says "exit code two blocks".\n', encoding="utf-8"
+    )
     two = tmp_path / "two.md"
-    two.write_text('[a](https://a.example) says "another quote right here".\n', encoding="utf-8")
+    two.write_text(
+        '[a](https://a.example) says "another quote right here".\n', encoding="utf-8"
+    )
     assert main([str(one), str(two)], fetch=_fetcher({})) == 0
     assert "unfetchable sources: 1" in capsys.readouterr().out
 
@@ -276,7 +323,9 @@ def test_ci_unfetchable_source_is_counted_once_across_quotes_and_docs(tmp_path, 
 # --- JSON report for the weekly run (#105) ----------------------------------------
 
 
-def test_json_report_lists_each_quote_not_marked_found_with_its_unfetched_sources(tmp_path):
+def test_json_report_lists_each_quote_not_marked_found_with_its_unfetched_sources(
+    tmp_path,
+):
     body = (
         'The [docs](https://a.example) and [b](https://b.example) say "exit code two blocks".\n\n'
         'The [c](https://c.example) page says "this one is found".\n\n'
@@ -295,13 +344,20 @@ def test_json_report_lists_each_quote_not_marked_found_with_its_unfetched_source
     assert data["unfetchable_sources"] == ["https://b.example"]
     assert data["findings"] == [
         {
-            "doc": str(doc), "line": 5, "verdict": "unfetchable", "quote": "exit code two blocks",
+            "doc": str(doc),
+            "line": 5,
+            "verdict": "unfetchable",
+            "quote": "exit code two blocks",
             "tried": ["https://a.example", "https://b.example"],
             "unfetched": ["https://b.example"],
         },
         {
-            "doc": str(doc), "line": 9, "verdict": "NOT FOUND", "quote": "this one is wrong",
-            "tried": ["https://d.example"], "unfetched": [],
+            "doc": str(doc),
+            "line": 9,
+            "verdict": "NOT FOUND",
+            "quote": "this one is wrong",
+            "tried": ["https://d.example"],
+            "unfetched": [],
         },
     ]
 
@@ -317,16 +373,14 @@ def test_json_flag_without_a_path_or_docs_prints_usage():
 
 FIXTURES = Path(__file__).parent / "fixtures" / "check_quotes"
 CSF_URL = "https://csf.tools/reference/nist-sp-800-53/r5/cm/cm-5/cm-5-4/"
-ANSIBLE_URL = (
-    "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/blockinfile_module.html"
-)
+ANSIBLE_URL = "https://docs.ansible.com/ansible/latest/collections/ansible/builtin/blockinfile_module.html"
 CSF_QUOTE = "two qualified individuals approve and implement"
-ANSIBLE_QUOTE = (
-    "insert/update/remove a block of multi-line text surrounded by customizable marker lines"
-)
+ANSIBLE_QUOTE = "insert/update/remove a block of multi-line text surrounded by customizable marker lines"
 
 
-def _serve(monkeypatch, responses: dict[str, tuple[int, str]]) -> tuple[list[str], list[int]]:
+def _serve(
+    monkeypatch, responses: dict[str, tuple[int, str]]
+) -> tuple[list[str], list[int]]:
     """Answer urlopen with (status, fixture file) per URL. Returns (URLs asked, sleeps)."""
     import email.message
     import io
@@ -361,7 +415,9 @@ def _serve(monkeypatch, responses: dict[str, tuple[int, str]]) -> tuple[list[str
         if status >= 400:
             headers = email.message.Message()
             headers["Content-Type"] = "text/html; charset=UTF-8"
-            raise urllib.error.HTTPError(url, status, "refused", headers, io.BytesIO(body))
+            raise urllib.error.HTTPError(
+                url, status, "refused", headers, io.BytesIO(body)
+            )
         return Response(status, body)
 
     monkeypatch.setattr(check_quotes.urllib.request, "urlopen", urlopen)
@@ -373,7 +429,10 @@ def _serve(monkeypatch, responses: dict[str, tuple[int, str]]) -> tuple[list[str
 def test_csf_tools_and_ansible_pages_as_served_hold_their_quotes(tmp_path, monkeypatch):
     _serve(
         monkeypatch,
-        {CSF_URL: (200, "csf-tools-cm-5-4.html"), ANSIBLE_URL: (200, "ansible-blockinfile.html")},
+        {
+            CSF_URL: (200, "csf-tools-cm-5-4.html"),
+            ANSIBLE_URL: (200, "ansible-blockinfile.html"),
+        },
     )
     body = (
         f'CSF Tools [CM-5(4)]({CSF_URL}) wants "{CSF_QUOTE}" for each change.\n\n'
@@ -385,7 +444,9 @@ def test_csf_tools_and_ansible_pages_as_served_hold_their_quotes(tmp_path, monke
     ]
 
 
-def test_csf_tools_bot_check_page_is_unfetchable_not_not_found(tmp_path, monkeypatch, capsys):
+def test_csf_tools_bot_check_page_is_unfetchable_not_not_found(
+    tmp_path, monkeypatch, capsys
+):
     # The shape of the false NOT FOUND: the paragraph credits the refused page and another
     # page that was fetched and lacks the quote.
     _serve(
@@ -395,8 +456,12 @@ def test_csf_tools_bot_check_page_is_unfetchable_not_not_found(tmp_path, monkeyp
             ANSIBLE_URL: (200, "ansible-blockinfile.html"),
         },
     )
-    doc = _doc(tmp_path, f'Per [CM-5(4)]({CSF_URL}) and [this]({ANSIBLE_URL}): "{CSF_QUOTE}".')
-    assert [(q.text, v, u) for q, v, u in check(doc)] == [(CSF_QUOTE, "unfetchable", (CSF_URL,))]
+    doc = _doc(
+        tmp_path, f'Per [CM-5(4)]({CSF_URL}) and [this]({ANSIBLE_URL}): "{CSF_QUOTE}".'
+    )
+    assert [(q.text, v, u) for q, v, u in check(doc)] == [
+        (CSF_QUOTE, "unfetchable", (CSF_URL,))
+    ]
     assert main([str(doc)]) == 0
     assert f"could not fetch: {CSF_URL}" in capsys.readouterr().out
 

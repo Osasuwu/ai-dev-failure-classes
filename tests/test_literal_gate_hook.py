@@ -27,7 +27,13 @@ SNIPPET = ROOT / ".agents" / "hooks" / "settings.snippet.json"
 
 FAKE_LITERAL = "Zorblax Quint"
 FAKE_PATH_LITERAL = r"C:\Users\zqfake"
-FAKE_VARIANTS = ("zorblax-quint", "ZORBLAX_QUINT", "ZorblaxQuint", "zorblax quint", "zqfake")
+FAKE_VARIANTS = (
+    "zorblax-quint",
+    "ZORBLAX_QUINT",
+    "ZorblaxQuint",
+    "zorblax quint",
+    "zqfake",
+)
 
 
 def _run(
@@ -82,11 +88,17 @@ def _assert_blocked_quietly(result) -> None:
     "tool, tool_input",
     [
         ("create_pull_request", {"title": "fix", "body": "thanks to zorblax-quint"}),
-        ("issue_write", {"method": "create", "title": "ZorblaxQuint report", "body": "x"}),
+        (
+            "issue_write",
+            {"method": "create", "title": "ZorblaxQuint report", "body": "x"},
+        ),
         ("add_issue_comment", {"issue_number": 1, "body": "cc ZORBLAX_QUINT"}),
         ("merge_pull_request", {"pullNumber": 1, "commit_message": "zorblax quint"}),
         ("push_files", {"files": [{"path": "a.md", "content": "Zorblax.Quint"}]}),
-        ("create_or_update_file", {"path": "a.md", "content": "see /c/Users/zqfake/notes"}),
+        (
+            "create_or_update_file",
+            {"path": "a.md", "content": "see /c/Users/zqfake/notes"},
+        ),
     ],
 )
 def test_mcp_write_with_a_literal_variant_is_blocked(tool, tool_input):
@@ -239,7 +251,9 @@ def test_block_on_a_body_file_withholds_a_path_that_itself_matches(tmp_path: Pat
     assert "body file <path withheld" in result.stderr
 
 
-@pytest.mark.skipif(os.name != "nt", reason="Git Bash drive paths exist only on Windows")
+@pytest.mark.skipif(
+    os.name != "nt", reason="Git Bash drive paths exist only on Windows"
+)
 def test_body_file_given_as_a_git_bash_drive_path_is_read(tmp_path: Path):
     body = tmp_path / "body.md"
     body.write_text("zorblax quint\n", encoding="utf-8")
@@ -334,7 +348,9 @@ def test_commands_that_send_no_text_are_not_scanned(command):
 
 
 def test_other_tools_pass_through():
-    result = _run({"tool_name": "Read", "tool_input": {"file_path": "/c/Users/zqfake/x"}})
+    result = _run(
+        {"tool_name": "Read", "tool_input": {"file_path": "/c/Users/zqfake/x"}}
+    )
     assert result.returncode == 0
 
 
@@ -393,7 +409,9 @@ def test_command_hit_is_located_by_line_and_column():
 
 
 def test_body_file_hit_is_located_by_line_and_column(tmp_path: Path):
-    (tmp_path / "body.md").write_text("## Summary\nhi zorblax quint\n", encoding="utf-8")
+    (tmp_path / "body.md").write_text(
+        "## Summary\nhi zorblax quint\n", encoding="utf-8"
+    )
     result = _run(_bash("gh pr comment 1 --body-file body.md", cwd=tmp_path))
     _assert_blocked_quietly(result)
     assert "at: body file body.md, line 2:4." in result.stderr
@@ -503,7 +521,9 @@ def test_write_to_a_repo_not_on_the_allowlist_is_checked(tmp_path: Path, command
 
 
 def test_missing_allowlist_allowlists_nothing():
-    _assert_blocked_quietly(_run(_bash("gh -R me/priv pr comment 1 --body 'zorblax quint'")))
+    _assert_blocked_quietly(
+        _run(_bash("gh -R me/priv pr comment 1 --body 'zorblax quint'"))
+    )
 
 
 def test_target_is_read_per_gh_step(tmp_path: Path):
@@ -525,10 +545,16 @@ def test_target_is_read_per_gh_step(tmp_path: Path):
 def test_mcp_write_to_an_allowlisted_repo_is_not_checked(tmp_path: Path):
     home = _home_with_allowlist(tmp_path, "me/priv")
     private = _mcp(
-        "add_issue_comment", owner="Me", repo="Priv", issue_number=1, body="zorblax quint"
+        "add_issue_comment",
+        owner="Me",
+        repo="Priv",
+        issue_number=1,
+        body="zorblax quint",
     )
     assert _run(private, home=home).returncode == 0
-    public = _mcp("add_issue_comment", owner="o", repo="r", issue_number=1, body="zorblax quint")
+    public = _mcp(
+        "add_issue_comment", owner="o", repo="r", issue_number=1, body="zorblax quint"
+    )
     _assert_blocked_quietly(_run(public, home=home))
 
 
@@ -544,24 +570,41 @@ def test_mcp_write_to_an_allowlisted_repo_is_not_checked(tmp_path: Path):
     [
         ("Bash", "echo me/priv >> ~/.config/literal-gate-allowed-repos.txt"),
         ("Bash", "printf '' > \"$HOME/.config/personal-literals.txt\""),
-        ("Bash", "echo me/priv | tee -a /c/Users/zqfake/.config/literal-gate-allowed-repos.txt"),
+        (
+            "Bash",
+            "echo me/priv | tee -a /c/Users/zqfake/.config/literal-gate-allowed-repos.txt",
+        ),
         ("Bash", "echo me/priv &>> ~/.Config/Literal-Gate-Allowed-Repos.TXT"),
-        ("Bash", "f=~/.config/literal-gate-allowed-repos.txt; echo me/priv >> \"$f\""),
+        ("Bash", 'f=~/.config/literal-gate-allowed-repos.txt; echo me/priv >> "$f"'),
         ("Bash", "cp /tmp/x ~/.config/personal-literals.txt"),
         ("Bash", "sed -i '/zorblax/d' ~/.config/personal-literals.txt"),
-        ("PowerShell", r'Add-Content -Path "$HOME\.config\literal-gate-allowed-repos.txt" me/priv'),
+        (
+            "PowerShell",
+            r'Add-Content -Path "$HOME\.config\literal-gate-allowed-repos.txt" me/priv',
+        ),
         ("PowerShell", r"Set-Content C:\Users\zqfake\.config\personal-literals.txt ''"),
-        ("PowerShell", "'me/priv' | Out-File -Append ~/.config/literal-gate-allowed-repos.txt"),
+        (
+            "PowerShell",
+            "'me/priv' | Out-File -Append ~/.config/literal-gate-allowed-repos.txt",
+        ),
         ("PowerShell", "'me/priv' >> $HOME/.config/literal-gate-allowed-repos.txt"),
-        ("PowerShell", r"Copy-Item x.txt $env:USERPROFILE\.config\personal-literals.txt"),
+        (
+            "PowerShell",
+            r"Copy-Item x.txt $env:USERPROFILE\.config\personal-literals.txt",
+        ),
         ("Bash", "echo me/priv >> ~/.config/literal-gate-allowed-repos.'txt'"),
         ("PowerShell", "Add-Content ~/.config/personal-lit`erals.txt x"),
-        ("PowerShell", "$nullpath = '~/.config/personal-literals.txt'; 'x' > $nullpath"),
+        (
+            "PowerShell",
+            "$nullpath = '~/.config/personal-literals.txt'; 'x' > $nullpath",
+        ),
     ],
 )
 def test_shell_write_to_an_operator_file_is_blocked(tool, command):
     for literals in (f"{FAKE_LITERAL}\n{FAKE_PATH_LITERAL}", None):
-        result = _run({"tool_name": tool, "tool_input": {"command": command}}, literals=literals)
+        result = _run(
+            {"tool_name": tool, "tool_input": {"command": command}}, literals=literals
+        )
         assert result.returncode == 2, (literals, result.stderr)
         assert "edited by the operator by hand" in result.stderr
 
@@ -571,12 +614,18 @@ def test_shell_write_to_an_operator_file_is_blocked(tool, command):
     [
         ("Bash", "cat ~/.config/literal-gate-allowed-repos.txt"),
         ("Bash", "grep -c . ~/.config/personal-literals.txt 2>&1"),
-        ("Bash", "grep -q me/priv ~/.config/literal-gate-allowed-repos.txt > /dev/null"),
-        ("Bash", 'export PERSONAL_LITERALS="$(cat "$HOME/.config/personal-literals.txt")"'),
+        (
+            "Bash",
+            "grep -q me/priv ~/.config/literal-gate-allowed-repos.txt > /dev/null",
+        ),
+        (
+            "Bash",
+            'export PERSONAL_LITERALS="$(cat "$HOME/.config/personal-literals.txt")"',
+        ),
         ("Bash", "echo x >> ~/.config/other-tool.txt"),
         ("Bash", "echo x | tee ~/.config/literal-gate-allowed-repos.txt.bak"),
         ("Bash", "cp a.txt ~/.config/my-personal-literals.txt"),
-        ("PowerShell", "Get-Content -Raw \"$HOME/.config/personal-literals.txt\""),
+        ("PowerShell", 'Get-Content -Raw "$HOME/.config/personal-literals.txt"'),
         ("PowerShell", "Set-Content ~/.config/other-tool.txt x"),
         ("PowerShell", "Get-Content ~/.config/personal-literals.txt > $null"),
         ("PowerShell", "Get-Content ~/.config/personal-literals.txt > nul"),
@@ -637,7 +686,9 @@ def test_no_separate_literal_gate_snippet():
 
 
 def test_hook_script_is_protected_from_agent_edits():
-    text = (ROOT / ".agents" / "hooks" / "protected-files.py").read_text(encoding="utf-8")
+    text = (ROOT / ".agents" / "hooks" / "protected-files.py").read_text(
+        encoding="utf-8"
+    )
     assert '".agents/hooks/literal-gate.py"' in text
 
 
@@ -645,6 +696,7 @@ def test_operator_files_shell_and_edit_routes_name_the_same_files():
     """protected-files.py (Edit/Write) and this hook (shell) guard the same two files, and
     they are the files the install steps name (#268). Parity between two artifacts that
     must agree, so both sides come from production."""
+
     def load(path: Path, name: str):
         spec = importlib.util.spec_from_file_location(name, path)
         module = importlib.util.module_from_spec(spec)
@@ -652,12 +704,18 @@ def test_operator_files_shell_and_edit_routes_name_the_same_files():
         return module
 
     gate = load(HOOK, "literal_gate_under_test")
-    protected = load(ROOT / ".agents" / "hooks" / "protected-files.py", "protected_files_under_test")
+    protected = load(
+        ROOT / ".agents" / "hooks" / "protected-files.py", "protected_files_under_test"
+    )
     assert set(gate.PROTECTED_CONFIG) == protected.PROTECTED_HOME
     assert set(gate.PROTECTED_CONFIG) == {
         "~/.config/literal-gate-allowed-repos.txt",
         "~/.config/personal-literals.txt",
     }
     install = gate.__doc__.split("Install", 1)[1]
-    assert '"$HOME/.config/personal-literals.txt"' in install  # step 1 names the list file
-    assert "`~/.config/literal-gate-allowed-repos.txt`" in install  # step 3, the allowlist
+    assert (
+        '"$HOME/.config/personal-literals.txt"' in install
+    )  # step 1 names the list file
+    assert (
+        "`~/.config/literal-gate-allowed-repos.txt`" in install
+    )  # step 3, the allowlist

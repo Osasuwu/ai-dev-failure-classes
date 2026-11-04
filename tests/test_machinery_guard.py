@@ -44,7 +44,12 @@ def test_triggers_on_pull_request_target_with_all_six_types():
     assert re.search(r"^on:\n  pull_request_target:\n", head, re.M)
     types = re.findall(r"^      - (\w+)$", head, re.M)
     assert types == [
-        "opened", "synchronize", "reopened", "ready_for_review", "labeled", "unlabeled",
+        "opened",
+        "synchronize",
+        "reopened",
+        "ready_for_review",
+        "labeled",
+        "unlabeled",
     ]
     # Exactly one trigger: a `pull_request` trigger would run the PR's copy.
     assert not re.search(r"^  pull_request:", head, re.M)
@@ -150,7 +155,12 @@ def _run(action, files, labels=(), attempt="1"):
     proc = subprocess.run(
         [NODE, "-e", src],
         input=json.dumps(
-            {"action": action, "files": files, "labels": list(labels), "attempt": attempt}
+            {
+                "action": action,
+                "files": files,
+                "labels": list(labels),
+                "attempt": attempt,
+            }
         ),
         capture_output=True,
         text=True,
@@ -205,7 +215,9 @@ def test_rerun_of_an_old_push_run_does_not_undo_the_release():
 
 
 def test_renaming_a_gate_out_of_its_directory_is_caught():
-    moved = [{"filename": "docs/gate.py", "previous_filename": "tests/structure_gate.py"}]
+    moved = [
+        {"filename": "docs/gate.py", "previous_filename": "tests/structure_gate.py"}
+    ]
     out = _run("synchronize", moved)
     assert out["added"] == ["waiting-human-review"]
     assert out["failed"]

@@ -95,7 +95,10 @@ BASH_DANGER_PATTERNS = [
     # Reading .env and piping/redirecting somewhere. The reader starts a word (not `type`
     # inside `-ItemType`), and `.env` is not the start of `.Environment`
     # (`[System.Environment]`): both are everyday PowerShell.
-    (r"(?<![\w-])(?:cat|type|Get-Content|gc)\s+[^\|;]*\.env(?!iron)", "Reading .env file"),
+    (
+        r"(?<![\w-])(?:cat|type|Get-Content|gc)\s+[^\|;]*\.env(?!iron)",
+        "Reading .env file",
+    ),
     # The same read through a .NET file API (`[IO.File]::ReadAllText('.env')`), PowerShell's
     # other `cat`, from either shell tool (a Bash call can run it through `pwsh -c`). Only the
     # methods that read or open the file: `Exists` reads nothing out of it (#281).
@@ -135,7 +138,9 @@ BASH_DANGER_PATTERNS = [
     (r"ToBase64String.*\.env", "Encoding .env"),
 ]
 
-COMPILED_BASH = [(re.compile(p, re.IGNORECASE), label) for p, label in BASH_DANGER_PATTERNS]
+COMPILED_BASH = [
+    (re.compile(p, re.IGNORECASE), label) for p, label in BASH_DANGER_PATTERNS
+]
 
 
 # ---------------------------------------------------------------------------
