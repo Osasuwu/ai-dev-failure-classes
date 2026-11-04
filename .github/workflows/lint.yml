@@ -1,9 +1,10 @@
 name: Lint
 
-# `ruff check` over every Python file, on every PR and every push to main. No paths filter: the
-# job always runs and reports, so it can be made a required check later without freezing merges.
+# `ruff check` and `ruff format --check` over every Python file, on every PR and every push to
+# main. No paths filter: `ruff` is a required check on main, so the job must always run and report.
 # The ruff version comes from .github/ruff-requirements.txt, the only place it is pinned.
-# Formatting (`ruff format --check`) is deliberately not run yet: see the PR that added this job.
+# The one formatter-only commit is listed in .git-blame-ignore-revs; to fix a red Format step,
+# run `ruff format .` at the pinned version.
 
 on:
   pull_request:
@@ -26,3 +27,7 @@ jobs:
         run: pip install -r .github/ruff-requirements.txt
       - name: Lint
         run: ruff check .
+      - name: Format
+        # Runs even when Lint fails, so one run reports both.
+        if: success() || failure()
+        run: ruff format --check .
