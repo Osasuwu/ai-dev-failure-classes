@@ -51,7 +51,9 @@ def _fetcher(outcomes: dict[str, object]):
 
 def _repo(tmp_path: Path, definition: dict = SHIPPED) -> Path:
     (tmp_path / ".github").mkdir(parents=True)
-    (tmp_path / ".github" / "hold-paths.json").write_text(json.dumps(definition), encoding="utf-8")
+    (tmp_path / ".github" / "hold-paths.json").write_text(
+        json.dumps(definition), encoding="utf-8"
+    )
     return tmp_path
 
 
@@ -62,7 +64,9 @@ def _write(root: Path, rel: str, body: str) -> str:
     return rel
 
 
-def _run(tmp_path, monkeypatch, capsys, files: dict[str, str], outcomes: dict[str, object]):
+def _run(
+    tmp_path, monkeypatch, capsys, files: dict[str, str], outcomes: dict[str, object]
+):
     root = _repo(tmp_path)
     for rel, body in files.items():
         _write(root, rel, body)
@@ -96,7 +100,10 @@ def _run(tmp_path, monkeypatch, capsys, files: dict[str, str], outcomes: dict[st
 )
 def test_a_web_link_gets_its_state_from_the_response(tmp_path, outcome, state, reason):
     url = "https://example.org/page"
-    assert judge(url, tmp_path / "doc.md", fetch=_fetcher({url: outcome})) == (state, reason)
+    assert judge(url, tmp_path / "doc.md", fetch=_fetcher({url: outcome})) == (
+        state,
+        reason,
+    )
 
 
 def test_the_fragment_is_not_sent_with_the_request(tmp_path):
@@ -106,7 +113,10 @@ def test_the_fragment_is_not_sent_with_the_request(tmp_path):
         seen.append(url)
         return 200
 
-    assert judge("https://example.org/page#part", tmp_path / "doc.md", fetch=fetch)[0] == ALIVE
+    assert (
+        judge("https://example.org/page#part", tmp_path / "doc.md", fetch=fetch)[0]
+        == ALIVE
+    )
     assert seen == ["https://example.org/page"]
 
 
@@ -125,7 +135,9 @@ def test_a_relative_link_to_a_missing_file_is_dead(tmp_path):
     assert judge("missing.md", doc, fetch=None) == (DEAD, "no such file")
 
 
-def test_a_link_starting_with_a_slash_is_relative_to_the_repository_root(tmp_path, monkeypatch):
+def test_a_link_starting_with_a_slash_is_relative_to_the_repository_root(
+    tmp_path, monkeypatch
+):
     _write(tmp_path, "AGENTS.md", "x")
     monkeypatch.chdir(tmp_path)
     doc = tmp_path / "docs" / "classes" / "a.md"
@@ -140,18 +152,27 @@ def test_a_percent_encoded_relative_link_is_decoded(tmp_path):
 
 @pytest.mark.parametrize("url", ["mailto:someone@example.org", "ftp://example.org/x"])
 def test_a_link_of_another_scheme_is_not_verified(tmp_path, url):
-    assert judge(url, tmp_path / "doc.md", fetch=None) == (NOT_VERIFIED, "not an http(s) or file link")
+    assert judge(url, tmp_path / "doc.md", fetch=None) == (
+        NOT_VERIFIED,
+        "not an http(s) or file link",
+    )
 
 
 # --- the run -----------------------------------------------------------------
 
 
-def test_a_dead_link_fails_the_run_and_every_link_is_reported(tmp_path, monkeypatch, capsys):
+def test_a_dead_link_fails_the_run_and_every_link_is_reported(
+    tmp_path, monkeypatch, capsys
+):
     body = (
         "One [alive](https://a.example/x) and one [dead](https://d.example/x).\n\n"
         "Then [blocked](https://b.example/x) and [local](missing.md).\n"
     )
-    outcomes = {"https://a.example/x": 200, "https://d.example/x": 404, "https://b.example/x": 403}
+    outcomes = {
+        "https://a.example/x": 200,
+        "https://d.example/x": 404,
+        "https://b.example/x": 403,
+    }
     code, out = _run(tmp_path, monkeypatch, capsys, {"docs/a.md": body}, outcomes)
     assert code == 1
     assert "docs/a.md:1: alive: https://a.example/x (HTTP 200)" in out
@@ -164,7 +185,9 @@ def test_a_dead_link_fails_the_run_and_every_link_is_reported(tmp_path, monkeypa
     )
 
 
-def test_a_link_that_is_only_not_verified_does_not_fail_the_run(tmp_path, monkeypatch, capsys):
+def test_a_link_that_is_only_not_verified_does_not_fail_the_run(
+    tmp_path, monkeypatch, capsys
+):
     body = "See [a](https://a.example/x), [b](https://b.example/x) and [c](https://c.example/x).\n"
     outcomes = {
         "https://a.example/x": 200,
@@ -173,10 +196,14 @@ def test_a_link_that_is_only_not_verified_does_not_fail_the_run(tmp_path, monkey
     }
     code, out = _run(tmp_path, monkeypatch, capsys, {"docs/a.md": body}, outcomes)
     assert code == 0
-    assert out.splitlines()[-1].startswith("1 file(s), 3 link(s): 1 alive, 0 dead, 2 not verified")
+    assert out.splitlines()[-1].startswith(
+        "1 file(s), 3 link(s): 1 alive, 0 dead, 2 not verified"
+    )
 
 
-def test_a_link_repeated_in_a_doc_is_fetched_and_reported_once(tmp_path, monkeypatch, capsys):
+def test_a_link_repeated_in_a_doc_is_fetched_and_reported_once(
+    tmp_path, monkeypatch, capsys
+):
     calls = []
 
     def fetch(url):
@@ -184,7 +211,9 @@ def test_a_link_repeated_in_a_doc_is_fetched_and_reported_once(tmp_path, monkeyp
         return 200
 
     root = _repo(tmp_path)
-    _write(root, "docs/a.md", "[x](https://a.example/x)\n\n[again](https://a.example/x)\n")
+    _write(
+        root, "docs/a.md", "[x](https://a.example/x)\n\n[again](https://a.example/x)\n"
+    )
     _write(root, "docs/b.md", "[x](https://a.example/x)\n")
     monkeypatch.chdir(root)
     monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
@@ -203,7 +232,9 @@ def test_links_in_code_and_anchors_are_not_links(tmp_path, monkeypatch, capsys):
     assert out.splitlines()[-1].startswith("1 file(s), 0 link(s)")
 
 
-def test_files_outside_the_path_definition_are_not_checked(tmp_path, monkeypatch, capsys):
+def test_files_outside_the_path_definition_are_not_checked(
+    tmp_path, monkeypatch, capsys
+):
     files = {
         "docs/adr/0004-x.md": "[x](https://adr.example/x)\n",
         "scripts/README.md": "[x](https://scripts.example/x)\n",
@@ -216,9 +247,18 @@ def test_files_outside_the_path_definition_are_not_checked(tmp_path, monkeypatch
 
 
 def test_no_changed_doc_reports_nothing_and_passes(tmp_path, monkeypatch, capsys):
-    code, out = _run(tmp_path, monkeypatch, capsys, {"scripts/README.md": "[x](https://s.example/x)\n"}, {})
+    code, out = _run(
+        tmp_path,
+        monkeypatch,
+        capsys,
+        {"scripts/README.md": "[x](https://s.example/x)\n"},
+        {},
+    )
     assert code == 0
-    assert out.strip() == "No changed markdown file under the shared path definition; nothing to check."
+    assert (
+        out.strip()
+        == "No changed markdown file under the shared path definition; nothing to check."
+    )
 
 
 def test_a_missing_path_definition_fails_the_run(tmp_path, monkeypatch, capsys):
@@ -228,7 +268,9 @@ def test_a_missing_path_definition_fails_the_run(tmp_path, monkeypatch, capsys):
     assert ".github/hold-paths.json" in capsys.readouterr().out
 
 
-def test_the_report_header_and_summary_go_to_the_job_summary(tmp_path, monkeypatch, capsys):
+def test_the_report_header_and_summary_go_to_the_job_summary(
+    tmp_path, monkeypatch, capsys
+):
     summary = tmp_path / "summary.md"
     root = _repo(tmp_path / "repo")
     _write(root, "docs/a.md", "[x](https://d.example/x)\n")
@@ -271,7 +313,9 @@ CHANGED_DEFINITION = {
 
 def test_selection_is_the_hold_definition_narrowed_to_markdown_under_the_shipped_definition():
     checked = {p for p in CORPUS if is_checked(p, SHIPPED)}
-    assert checked == {p for p in CORPUS if is_hold_path(p, SHIPPED) and p.endswith(".md")}
+    assert checked == {
+        p for p in CORPUS if is_hold_path(p, SHIPPED) and p.endswith(".md")
+    }
     assert checked == {
         "README.md",
         "docs/guide.md",
@@ -283,7 +327,9 @@ def test_selection_is_the_hold_definition_narrowed_to_markdown_under_the_shipped
 
 def test_selection_follows_a_changed_definition():
     checked = {p for p in CORPUS if is_checked(p, CHANGED_DEFINITION)}
-    assert checked == {p for p in CORPUS if is_hold_path(p, CHANGED_DEFINITION) and p.endswith(".md")}
+    assert checked == {
+        p for p in CORPUS if is_hold_path(p, CHANGED_DEFINITION) and p.endswith(".md")
+    }
     assert checked == {"notes/a.md", "private/keep.md", "docs/adr/0004-x.md"}
 
 
@@ -297,10 +343,16 @@ def test_the_workflow_runs_on_pull_requests_only():
 
 
 def test_no_workflow_runs_the_link_check_on_a_schedule():
-    runners = [p for p in sorted(WORKFLOWS.glob("*.y*ml")) if "check_links.py" in p.read_text(encoding="utf-8")]
+    runners = [
+        p
+        for p in sorted(WORKFLOWS.glob("*.y*ml"))
+        if "check_links.py" in p.read_text(encoding="utf-8")
+    ]
     assert [p.name for p in runners] == ["link-check.yml"]
     for path in runners:
-        assert not re.search(r"^\s*schedule:", path.read_text(encoding="utf-8"), re.M), path.name
+        assert not re.search(
+            r"^\s*schedule:", path.read_text(encoding="utf-8"), re.M
+        ), path.name
 
 
 def test_the_check_is_named_for_links_and_claims_nothing_about_content():
@@ -309,7 +361,10 @@ def test_the_check_is_named_for_links_and_claims_nothing_about_content():
 
 
 def _run_block() -> str:
-    match = re.search(r"- name: Check links in changed docs\n(?: {8}.*\n)*? {8}run: \|\n((?:(?: {10}.*)?\n)+)", WORKFLOW)
+    match = re.search(
+        r"- name: Check links in changed docs\n(?: {8}.*\n)*? {8}run: \|\n((?:(?: {10}.*)?\n)+)",
+        WORKFLOW,
+    )
     assert match, "check step missing"
     return textwrap.dedent(match.group(1))
 
@@ -322,7 +377,11 @@ def _find_bash() -> str | None:
     if git:
         # Git for Windows puts git.exe in cmd/, bin/ or mingw64/bin/; bash.exe is in <Git>/bin/.
         here = Path(git).parent
-        for candidate in (here.parent / "bin" / "bash.exe", here / "bash.exe", here.parent.parent / "bin" / "bash.exe"):
+        for candidate in (
+            here.parent / "bin" / "bash.exe",
+            here / "bash.exe",
+            here.parent.parent / "bin" / "bash.exe",
+        ):
             if candidate.exists():
                 return str(candidate)
     return None
@@ -334,12 +393,17 @@ BASH = _find_bash()
 def _git(repo: Path, *args: str) -> str:
     return subprocess.run(
         ["git", "-c", "user.name=t", "-c", "user.email=t@example.invalid", *args],
-        cwd=repo, check=True, capture_output=True, text=True,
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
     ).stdout.strip()
 
 
 @pytest.mark.parametrize("rc", [0, 1])
-def test_the_step_passes_the_changed_markdown_files_and_the_scripts_exit_code(tmp_path, rc):
+def test_the_step_passes_the_changed_markdown_files_and_the_scripts_exit_code(
+    tmp_path, rc
+):
     if BASH is None:
         if os.environ.get("CI"):
             pytest.fail("bash is required in CI to test the check step")
@@ -358,12 +422,16 @@ def test_the_step_passes_the_changed_markdown_files_and_the_scripts_exit_code(tm
     _git(repo, "commit", "-q", "-m", "change")
     args_file = tmp_path / "args.txt"
     # A stand-in for the real script: record the arguments, exit with the given code.
-    stub = f'python() {{ printf "%s\\n" "$@" > "{args_file.as_posix()}"; return {rc}; }}\n'
+    stub = (
+        f'python() {{ printf "%s\\n" "$@" > "{args_file.as_posix()}"; return {rc}; }}\n'
+    )
     step = tmp_path / "step.sh"
     # GitHub runs a `run:` block as `bash -e {0}`.
     step.write_text("set -e\n" + stub + _run_block(), encoding="utf-8", newline="\n")
     env = dict(os.environ, BASE_SHA=base)
-    proc = subprocess.run([BASH, step.as_posix()], cwd=repo, env=env, capture_output=True, text=True)
+    proc = subprocess.run(
+        [BASH, step.as_posix()], cwd=repo, env=env, capture_output=True, text=True
+    )
     assert proc.returncode == rc, proc.stderr
     args = args_file.read_text(encoding="utf-8").splitlines()
     # Selection by the path definition is the script's job; the step passes every changed .md

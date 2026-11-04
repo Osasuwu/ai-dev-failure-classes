@@ -103,7 +103,11 @@ def judge(url: str, doc: Path, fetch=fetch_status) -> tuple[str, str]:
     target = unquote(url.split("#", 1)[0].split("?", 1)[0])
     # A leading "/" is the repository root, as GitHub renders it. ".." is resolved on the text,
     # as GitHub does, so "a/../b.md" finds b.md on Linux too when a/ does not exist.
-    path = Path.cwd() / target.lstrip("/") if target.startswith("/") else doc.parent / target
+    path = (
+        Path.cwd() / target.lstrip("/")
+        if target.startswith("/")
+        else doc.parent / target
+    )
     path = Path(os.path.normpath(path))
     return (ALIVE, "file exists") if path.exists() else (DEAD, "no such file")
 
@@ -130,7 +134,9 @@ def main(argv: list[str], fetch=fetch_status) -> int:
         _write_step_summary([f"**Link check:** {line}"])
         return 0
 
-    cache: dict[str, tuple[str, str]] = {}  # web links only; a relative link depends on its doc
+    cache: dict[
+        str, tuple[str, str]
+    ] = {}  # web links only; a relative link depends on its doc
     counts = {ALIVE: 0, DEAD: 0, NOT_VERIFIED: 0}
     report: list[str] = []
     print(f"Link check: {HEADER}")
