@@ -26,7 +26,11 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          mapfile -t docs < <(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- '*.md' ':(exclude)tests/fixtures/**')
+          # Into a file first, so a failed diff fails the step (a <(...) failure is not seen);
+          # -z keeps a non-ASCII path as it is instead of git's quoted form.
+          list=$(mktemp)
+          git diff --name-only -z --diff-filter=d "$BASE_SHA"...HEAD -- '*.md' ':(exclude)tests/fixtures/**' > "$list"
+          mapfile -d '' -t docs < "$list"
           if [ "${#docs[@]}" -eq 0 ]; then
             msg="No doc changed in this PR; nothing to check. Quote check passes."
             echo "$msg"
