@@ -14,7 +14,7 @@ applies_when_not: Two agents or sessions writing the same file or state at the s
 
 ## TL;DR
 
-One fact lives in several places, and the agent changes some of them: the fix reaches one copy, the new version lands beside the old one, the deletion leaves references behind. Each copy passes its own checks, so the drift shows up after merge. What keeps copies in step is a mechanism that knows they are copies: one source with the rest generated and checked, a contract test between producer and consumer, a drift check against the template. Prompts and code search help the agent find copies, and clone detection finds copies that still look alike; nothing found here checks that a change reached a copy nobody declared and that no longer looks like the others.
+One fact lives in several places, and the agent changes some of them: the fix reaches one copy, the new version lands beside the old one, the deletion leaves references behind. Each copy passes its own checks, so the drift shows up after merge. What keeps copies in step is a mechanism that knows they are copies: one source with the rest generated and checked, a contract test between producer and consumer, a drift check against the template. Prompts and code search help the agent find copies, and clone detection finds copies that still look alike; nothing in the sources below checks that a change reached a copy nobody declared and that no longer looks like the others.
 
 ## Symptom
 
@@ -22,9 +22,11 @@ A change you asked for is done, its tests pass, and the same behaviour is still 
 
 ## Examples
 
+The INC- codes are rows in [the incident dataset](../../incidents/incidents.csv).
+
 - INC-181: a user reports that Claude Code keeps writing the same constant or path into several files instead of one ([anthropics/claude-code#37137](https://github.com/anthropics/claude-code/issues/37137)): "A bug in the shared value now requires fixing it in multiple places — and Claude may only fix one of them."
 - INC-161: an agent fixed a parsing bug in one function of a media-session gate; review found, a round later, that its sibling function sharing the same logic still had the old behaviour.
-- INC-169: one counter was written by three halves of an app (Dart, Kotlin, Python). They disagreed on cell type, row lookup and de-duplication, and user counts were undercounted for good; only the header had a parity test.
+- INC-169: one counter was written by three halves of an app (Dart, Kotlin, Python). They disagreed on cell type, row lookup and de-duplication, and user counts were undercounted for good; a parity test covered the sheet's header columns, and nothing checked the value types.
 - INC-165: a review gate copied into two repositories had the same fail-open hole. It was fixed in one repository and never ported, and the other kept passing PRs with no review verdict until a cross-repository comparison found it.
 - INC-159: a merge-hold check was deleted, and the documentation agents read still described it as live, so agents relied on a label that nothing enforced.
 
@@ -34,9 +36,9 @@ Four ways the copies come apart recur in the dataset rows of this class.
 
 **The agent edits where it is looking.** A fix starts at one site and stops when that site is green. Failure studies of issue-solving agents name this directly: one subcategory is changes that "adjust one implementer of an interface while neglecting others", another is that "recurring code patterns require simultaneous updates" ([Liu et al.](https://arxiv.org/html/2509.13941)). A refactoring benchmark found that "the dominant failure mode is _incomplete refactoring_", agents stopping before the peripheral call sites ([SWE-Bench ProMax](https://arxiv.org/html/2608.09802)). A sibling function, a twin in another language or a copy in another repository is not on the path the agent read, so it is not edited.
 
-**The agent writes beside instead of instead.** Asked for a change, an agent can re-implement logic that already exists rather than find it; the same study lists "re-implementing existing logic or ignoring tool extension points, adding redundant code and potentially new bugs" as its own subcategory ([Liu et al.](https://arxiv.org/html/2509.13941)). The old version keeps its callers, and from then on a fix to one does not reach the other (INC-182, INC-184). The same happens to rules: an agent told about a mistake appends a restated rule to its instruction file instead of finding the existing one (INC-183).
+**The agent writes a new copy instead of changing the old one.** Asked for a change, an agent can re-implement logic that already exists rather than find it; the same study lists "re-implementing existing logic or ignoring tool extension points, adding redundant code and potentially new bugs" as its own subcategory ([Liu et al.](https://arxiv.org/html/2509.13941)). The old version keeps its callers, and from then on a fix to one does not reach the other (INC-182, INC-184). In one row the same happened to a rule: an agent told about a mistake appended a restated rule to its instruction file instead of finding the existing one (INC-183).
 
-**Two components encode one contract separately.** A producer and a consumer, a template and a linter, a gate and the reviewer it calls each hold their own copy of a format, a vocabulary or a definition. One side changes and the other does not (INC-155, INC-156, INC-157, INC-160). When the copy is an allowlist or a matcher, the mismatch often fails open: the guard stops matching and says nothing (INC-150, INC-154).
+**Two components encode one contract separately.** A producer and a consumer, a template and a linter, a gate and the reviewer it calls each hold their own copy of a format, a vocabulary or a definition. One side changes and the other does not (INC-155, INC-156, INC-157, INC-160). In two rows the copy was an allowlist or a matcher, and the mismatch failed open: the guard stopped matching and said nothing (INC-150, INC-154).
 
 **Copies outlive whatever made them.** A file synced from a template into several repositories, or a claim about a guard copied along with it, stays when the sync stops; a fix or a retirement in one copy then does not reach the others (INC-163, INC-165, INC-166, INC-167). A deletion that does not search the docs leaves them describing something that is gone (INC-159).
 
@@ -44,13 +46,13 @@ In these rows each copy typically passed its own tests, because each test was wr
 
 ## Where it surfaces
 
-Mostly after merge. Of the 35 rows of this class, 23 were caught after merge (as of 2026-11, this dataset): in use, by a later audit, or while the agent worked on something else. Four surfaced in CI, all of them gates whose own copies disagreed, so no PR could pass (INC-157, INC-158, INC-160, INC-167). Two surfaced in review, when a review bot spotted the missed sibling (INC-161, INC-162). Five surfaced while the code was being written, one during task planning. In one operator's private audit of the same incidents, the agent itself found 18 of 31 later, against 5 found by CI and 2 by a review bot (as of 2026-10, private audit).
+Mostly after merge. Of the 35 rows of this class, 23 were caught after merge (as of 2026-11, this dataset): in use, by a later audit, or while the agent worked on something else. Four surfaced in CI, all of them gates whose own copies disagreed, so no PR could pass (INC-157, INC-158, INC-160, INC-167). Two surfaced in review, when a review bot spotted the missed sibling (INC-161, INC-162). Five surfaced while the code was being written, one during task planning. One operator's private audit covers the 31 rows from that operator's own repositories (INC-150 to INC-180) and records who noticed each one rather than the stage: in 18 of them it was the agent itself, later, while working on something else (as of 2026-10, private audit).
 
 The class is spread across stages, and no single gate covers it: the copy that was missed is not in the diff, so diff-scoped review and tests do not see it.
 
 ## Protections
 
-The rungs below either help the agent find copies or compare copies that were declared. One operator's record of 31 incidents of this class has no patch that compares copies: no parity test across twins, no reference check on deletion, no shared schema between producer and consumer. The checks that held in that record guard the merge machinery's own behaviour (fail closed, required checks), not copy agreement (as of 2026-10, private audit). The external search found no mechanism that finds an undeclared copy that no longer looks like the others and checks that a fix reached it; clone detection covers copies that still look alike. That gap is open; the ladder does not fill it.
+The rungs below either help the agent find copies or compare copies that were declared. One operator's record of 31 incidents of this class has no patch that compares copies: no parity test across twins, no reference check on deletion, no shared schema between producer and consumer. The checks that held in that record guard the merge machinery's own behaviour (fail closed, required checks), not copy agreement (as of 2026-10, private audit). The search of public tools, docs and studies behind this doc (its queries are listed in the pull request that added it) found no mechanism that finds an undeclared copy that no longer looks like the others and checks that a fix reached it; clone detection covers copies that still look alike. That gap is open; the ladder does not fill it.
 
 ### Prompt: tell the agent to look for siblings before it fixes or writes
 
@@ -74,7 +76,7 @@ The rungs below either help the agent find copies or compare copies that were de
 
 - **Source:** [ast-grep](https://ast-grep.github.io/guide/introduction.html) and [OpenRewrite](https://docs.openrewrite.org/) find and rewrite every site that matches a pattern; [Semgrep](https://docs.semgrep.dev/writing-rules/rule-ideas) can flag each remaining use of a deprecated API; [Sourcegraph Batch Changes](https://sourcegraph.com/docs/batch-changes) applies one change across many repositories.
 - **Cost:** writing the pattern or recipe; Batch Changes needs an Enterprise plan.
-- **Breaks when:** nobody knows the copies exist, so nobody writes the pattern; a copy differs in text from the pattern.
+- **Breaks when:** nobody knows the copies exist, so nobody writes the pattern (INC-161, INC-165); a copy differs in text from the pattern, so the pattern does not match it.
 
 ### Flag what a replacement left behind
 
@@ -98,7 +100,7 @@ The rungs below either help the agent find copies or compare copies that were de
 
 - **Source:** [cog](https://cog.readthedocs.io/en/latest/running.html): "You can use the `--check` option to run cog just to check that the files would not change if run again."; [embedme](https://github.com/zakhenry/embedme) verifies code blocks in markdown against their source files; Kubernetes runs [verify-codegen.sh](https://github.com/kubernetes/kubernetes/blob/master/hack/verify-codegen.sh) to fail when committed generated code is out of date.
 - **Cost:** a generator and a CI step.
-- **Breaks when:** a copy is written by hand outside the generated region, so it is not compared; the generator itself is not run in CI.
+- **Breaks when:** a copy is written by hand outside what the generator writes; the check re-runs the generator, so that copy is never compared. A check that is not wired into CI does not run.
 
 ### Check copied templates and configs against their source
 
