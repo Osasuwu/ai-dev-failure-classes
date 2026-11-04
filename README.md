@@ -48,7 +48,7 @@ Read these every time, whatever your repo looks like. They apply across classes 
 | [absence-read-as-success](docs/classes/absence-read-as-success.md) |  | ● | ● | ● | ● | ● | 23 | 18 | 14 primary, 9 private |
 | [claims-from-plausibility](docs/classes/claims-from-plausibility.md) | ● | ● | ● | ● |  | ● | 17 | 13 | 13 primary, 4 private |
 | [pattern-matched-boundaries](docs/classes/pattern-matched-boundaries.md) | ● | ● |  | ● | ● | ● | 17 | 6 | 15 primary, 2 private |
-| [tests-that-cannot-fail](docs/classes/tests-that-cannot-fail.md) |  | ● | ● | ● |  | ● | 16 | 16 | 11 primary, 5 private |
+| [tests-that-cannot-fail](docs/classes/tests-that-cannot-fail.md) |  | ● | ● | ● |  | ● | 15 | 15 | 10 primary, 5 private |
 
 **Candidates, not established.** No class doc and no incident evidence yet. Do not report them as classes.
 
