@@ -109,10 +109,14 @@ def test_the_gate_selects_documents_by_the_hold_path_definition(tmp_path):
     root = _tree(tmp_path)
     # docs/adr/ is excluded by the definition; the same file anywhere else under docs/ is a doc.
     (root / "docs" / "adr").mkdir()
-    (root / "docs" / "adr" / "0001-x.md").write_text("# ADR-0001\n\nDecided.\n", encoding="utf-8")
+    (root / "docs" / "adr" / "0001-x.md").write_text(
+        "# ADR-0001\n\nDecided.\n", encoding="utf-8"
+    )
     assert check_tree(root) == []
     (root / "docs" / "other").mkdir()
-    (root / "docs" / "other" / "0001-x.md").write_text("# Not an ADR\n", encoding="utf-8")
+    (root / "docs" / "other" / "0001-x.md").write_text(
+        "# Not an ADR\n", encoding="utf-8"
+    )
     assert ("docs/other/0001-x.md", "doc_missing_key:class") in _violations(root)
     # Moving docs/adr/ out of the exclusion list in the definition makes the ADR a doc too.
     definition = json.loads((root / HOLD_PATHS).read_text(encoding="utf-8"))
@@ -163,7 +167,15 @@ def test_surfaces_at_value_outside_the_vocabulary_fails(tmp_path):
 
 @pytest.mark.parametrize(
     "heading",
-    ["TL;DR", "Symptom", "Examples", "Mechanism", "Where it surfaces", "Protections", "Evidence"],
+    [
+        "TL;DR",
+        "Symptom",
+        "Examples",
+        "Mechanism",
+        "Where it surfaces",
+        "Protections",
+        "Evidence",
+    ],
 )
 def test_a_class_doc_without_a_required_section_fails(tmp_path, heading):
     root = _tree(tmp_path)
@@ -173,7 +185,9 @@ def test_a_class_doc_without_a_required_section_fails(tmp_path, heading):
 
 # --- class docs: Examples -----------------------------------------------------
 
-CROSS_EXAMPLES = "- INC-001: a case from class alpha.\n- INC-004: a case from class beta.\n"
+CROSS_EXAMPLES = (
+    "- INC-001: a case from class alpha.\n- INC-004: a case from class beta.\n"
+)
 
 
 def _cross_cites(root: Path, ids: list[str]) -> None:
@@ -207,7 +221,12 @@ def test_examples_citing_one_incident_twice_count_once(tmp_path):
 def test_an_incident_cited_outside_examples_is_not_an_example(tmp_path):
     root = _tree(tmp_path)
     _cross_cites(root, ["INC-001"])
-    _edit(root, CROSS, "A deleted resource that cannot be restored.", "See INC-004 and INC-005.")
+    _edit(
+        root,
+        CROSS,
+        "A deleted resource that cannot be restored.",
+        "See INC-004 and INC-005.",
+    )
     assert _violations(root) == [(CROSS, "examples_count")]
 
 
@@ -297,7 +316,12 @@ def test_a_rung_without_a_breaks_when_line_fails(tmp_path):
 
 def test_rung_fields_are_found_without_bold_markers(tmp_path):
     root = _tree(tmp_path)
-    _edit(root, ALPHA, "- **Cost:** reviewer time, no figure", "- Cost: reviewer time, no figure")
+    _edit(
+        root,
+        ALPHA,
+        "- **Cost:** reviewer time, no figure",
+        "- Cost: reviewer time, no figure",
+    )
     assert check_tree(root) == []
 
 
@@ -351,7 +375,9 @@ def test_the_size_cap_is_one_configured_value(tmp_path, monkeypatch):
     import structure_gate
 
     root = _tree(tmp_path)
-    monkeypatch.setattr(structure_gate, "DOC_SIZE_CAP_BYTES", (root / CROSS).stat().st_size)
+    monkeypatch.setattr(
+        structure_gate, "DOC_SIZE_CAP_BYTES", (root / CROSS).stat().st_size
+    )
     assert _violations(root) == [(ALPHA, "doc_over_size_cap")]
 
 
@@ -378,7 +404,12 @@ def test_a_dataset_without_a_column_fails(tmp_path, column):
 
 def test_a_row_with_an_empty_cell_fails(tmp_path):
     root = _tree(tmp_path)
-    _edit(root, DATASET, LAST_ROW, "INC-006,beta,after-merge,,primary,https://example.com/beta/3")
+    _edit(
+        root,
+        DATASET,
+        LAST_ROW,
+        "INC-006,beta,after-merge,,primary,https://example.com/beta/3",
+    )
     assert _violations(root) == [(DATASET, "row_missing_value:source_type")]
 
 
@@ -417,7 +448,10 @@ def test_an_evidence_strength_outside_the_vocabulary_fails(tmp_path):
 
 def test_a_row_that_no_class_doc_cites_passes(tmp_path):
     root = _tree(tmp_path)
-    docs = [(root / ALPHA).read_text(encoding="utf-8"), (root / CROSS).read_text(encoding="utf-8")]
+    docs = [
+        (root / ALPHA).read_text(encoding="utf-8"),
+        (root / CROSS).read_text(encoding="utf-8"),
+    ]
     assert not any("INC-006" in doc for doc in docs)
     assert LAST_ROW in (root / DATASET).read_text(encoding="utf-8")
     assert check_tree(root) == []

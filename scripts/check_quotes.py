@@ -123,7 +123,10 @@ def _paragraphs(text: str) -> list[tuple[int, str]]:
 
 def _body_lines(text: str) -> list[str]:
     """The doc's lines with HTML comments blanked and blockquote markers removed."""
-    return [_BLOCKQUOTE_RE.sub("", line) for line in _COMMENT_RE.sub(_blank, text).splitlines()]
+    return [
+        _BLOCKQUOTE_RE.sub("", line)
+        for line in _COMMENT_RE.sub(_blank, text).splitlines()
+    ]
 
 
 def _blank(match: re.Match) -> str:
@@ -152,7 +155,9 @@ def _quote_line(lines: list[str], start: int, body: str) -> int:
 
 def _urls(paragraph: str) -> tuple[str, ...]:
     """Markdown link targets, then bare URLs, in order."""
-    urls = tuple(url for _, url in _LINK_RE.findall(paragraph) if not url.startswith("#"))
+    urls = tuple(
+        url for _, url in _LINK_RE.findall(paragraph) if not url.startswith("#")
+    )
     bare = _BARE_URL_RE.findall(_LINK_RE.sub("", paragraph))
     return urls + tuple(u.rstrip(".,;:") for u in bare)
 
@@ -174,7 +179,9 @@ def extract_quotes(text: str) -> list[Quote]:
     for line, para in _paragraphs(text):
         urls = _urls(para)
         candidates = urls or prev_urls
-        prose = _LINK_RE.sub(r"[\1]", _drop_code_quotes(para))  # a link title is no quote
+        prose = _LINK_RE.sub(
+            r"[\1]", _drop_code_quotes(para)
+        )  # a link title is no quote
         for match in _QUOTE_RE.finditer(prose):
             body = match.group(1) or match.group(2)
             if len(body.split()) >= MIN_QUOTE_WORDS:
@@ -188,8 +195,13 @@ def normalize(text: str) -> str:
     text = _LINK_RE.sub(r"\1", text)
     text = text.translate(
         {
-            0x2018: "'", 0x2019: "'", 0x201C: '"', 0x201D: '"',
-            0x2013: "-", 0x2014: "-", 0x00A0: " ",
+            0x2018: "'",
+            0x2019: "'",
+            0x201C: '"',
+            0x201D: '"',
+            0x2013: "-",
+            0x2014: "-",
+            0x00A0: " ",
         }
     )
     text = re.sub(r"[*_`\\|]", "", text)
@@ -245,7 +257,9 @@ def fetch_url(url: str) -> str:
     blob = re.match(r"https://github\.com/([^/]+/[^/]+)/blob/(.+)", url)
     if blob:
         url = f"https://raw.githubusercontent.com/{blob.group(1)}/{blob.group(2)}"
-    request = urllib.request.Request(url, headers={"User-Agent": "jarvis-oss check_quotes"})
+    request = urllib.request.Request(
+        url, headers={"User-Agent": "jarvis-oss check_quotes"}
+    )
     for attempt in range(3):
         try:
             with urllib.request.urlopen(request, timeout=30) as response:
@@ -270,7 +284,9 @@ def check(doc: Path, fetch=fetch_url) -> list[tuple[Quote, str, tuple[str, ...]]
                     text = fetch(url)
                 except Exception:
                     text = None
-                cache[url] = text if text and len(normalize(text)) >= MIN_SOURCE_CHARS else None
+                cache[url] = (
+                    text if text and len(normalize(text)) >= MIN_SOURCE_CHARS else None
+                )
             else:
                 local = (doc.parent / url.split("#", 1)[0]).resolve()
                 try:
@@ -320,12 +336,15 @@ def main(argv: list[str], fetch=fetch_url) -> int:
             if verdict != "found":
                 findings.append(
                     {
-                        "doc": name, "line": quote.line, "verdict": verdict,
-                        "quote": quote.text, "tried": list(quote.urls),
+                        "doc": name,
+                        "line": quote.line,
+                        "verdict": verdict,
+                        "quote": quote.text,
+                        "tried": list(quote.urls),
                         "unfetched": list(unfetched),
                     }
                 )
-                print(f"{name}:{quote.line}: {verdict}: \"{quote.text}\"")
+                print(f'{name}:{quote.line}: {verdict}: "{quote.text}"')
                 if verdict == "NOT FOUND":
                     print(f"    tried: {', '.join(quote.urls)}")
                     not_found += 1
@@ -339,8 +358,11 @@ def main(argv: list[str], fetch=fetch_url) -> int:
     _write_step_summary(summary)
     if report_path:
         report = {
-            "docs": len(argv), "quotes": quotes, "not_found": not_found,
-            "unfetchable_sources": sorted(unfetched_sources), "findings": findings,
+            "docs": len(argv),
+            "quotes": quotes,
+            "not_found": not_found,
+            "unfetchable_sources": sorted(unfetched_sources),
+            "findings": findings,
         }
         Path(report_path).write_text(json.dumps(report, indent=2), encoding="utf-8")
     return 1 if not_found else 0

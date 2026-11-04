@@ -207,7 +207,9 @@ def _nested_texts(command: str, encoded: bool) -> list[tuple[str, bool]]:
             # A nested text is part of this one, already stripped with each heredoc's opening
             # line in view; stripping it again would lose `bash -c "$(cat <<EOF`'s `bash`.
             # Only decoded text is new.
-            texts.extend(command_texts(nested, True) if enc else _nested_texts(nested, encoded))
+            texts.extend(
+                command_texts(nested, True) if enc else _nested_texts(nested, encoded)
+            )
     return texts
 
 

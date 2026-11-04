@@ -15,8 +15,8 @@ hooks (`.agents/hooks/`), scripts (`scripts/`), tests (`tests/`), workflows (`.g
 ## Gates a PR must pass
 
 Required by branch protection on `main` (admins included): `structure-gate`, `gitleaks`,
-`tests`, `waiting-human-review`, `machinery-guard`. A required check you cannot make green is a
-stop, not a bypass.
+`tests`, `waiting-human-review`, `machinery-guard`, `ruff`. A required check you cannot make
+green is a stop, not a bypass.
 
 | Check | Workflow | Looks at |
 |---|---|---|
@@ -25,8 +25,9 @@ stop, not a bypass.
 | `gitleaks` | `gitleaks.yml` | secrets (`.gitleaks.toml`) and personal literals in the working tree |
 | `waiting-human-review` | `waiting-human-review.yml` | changed paths against `.github/hold-paths.json`, the label, review requests |
 | `machinery-guard` | `machinery-guard.yml` | changed paths against the machinery list in that workflow |
-| `ruff` (not required) | `lint.yml` | `ruff check .` over every Python file, on every PR and push to `main`; the version is pinned in `.github/ruff-requirements.txt` |
+| `ruff` | `lint.yml` | `ruff check .` and `ruff format --check .` over every Python file, on every PR and push to `main`; the version is pinned in `.github/ruff-requirements.txt` |
 | `quote-check` (not required) | `quote-check.yml` | quoted passages in changed `.md` files, via `scripts/check_quotes.py`; fails only on NOT FOUND |
+| `link-check` (not required) | `link-check.yml` | links in changed `.md` files under `.github/hold-paths.json`, via `scripts/check_links.py`: alive, dead or not verified; fails only on dead; never judges the page's content |
 | `doc-review` (not required) | `doc-review.yml` | advisory; the documents a PR changes, per `.github/hold-paths.json`: one run per PR, one more on request if the text changed; findings never fail it, an errored run does |
 
 Also: `quote-cron.yml` re-checks every doc weekly; `authority-detector.yml` records label

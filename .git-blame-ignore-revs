@@ -1,0 +1,8 @@
+# Formatter-only commits, skipped by `git blame`. GitHub's blame view reads this file on its
+# own; locally run `git config blame.ignoreRevsFile .git-blame-ignore-revs` once per clone.
+# List the SHA as it is on main, after the merge: a squash or rebase merge rewrites the
+# branch's SHAs, and git skips a SHA it cannot find without saying so.
+
+# Adopt ruff format (#266, PR #292). A squash merge: it also carries the lint.yml,
+# AGENTS.md and this file's first lines, so blame skips those few lines too.
+7fe362212e3637fd80e12e96a6b1ea50c39489e4

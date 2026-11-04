@@ -85,13 +85,17 @@ def _load_json(root: Path, rel: str, violations: list[Violation]):
     path = root / rel
     if not path.is_file():
         violations.append(
-            Violation(rel, "required_file_missing", f"{rel} is missing; the gate reads it")
+            Violation(
+                rel, "required_file_missing", f"{rel} is missing; the gate reads it"
+            )
         )
         return None
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
-        violations.append(Violation(rel, "required_file_invalid", f"{rel} is not JSON: {exc}"))
+        violations.append(
+            Violation(rel, "required_file_invalid", f"{rel} is not JSON: {exc}")
+        )
         return None
 
 
@@ -164,7 +168,9 @@ def _parse_frontmatter(text: str) -> dict[str, str | list[str]]:
         if value.startswith("[") and value.endswith("]"):
             fields[key] = [v.strip() for v in value[1:-1].split(",") if v.strip()]
         elif value == "":
-            fields[key] = []  # a block list follows; stays empty (and so invalid) if none does
+            fields[
+                key
+            ] = []  # a block list follows; stays empty (and so invalid) if none does
         else:
             fields[key] = value
     return fields
@@ -218,17 +224,29 @@ def _check_dataset(
             incident = fields.get("id", "")
             if incident and not _ID_RE.fullmatch(incident):
                 violations.append(
-                    Violation(DATASET_FILE, "row_bad_id", f"{where}: id '{incident}' is not INC-<digits>")
+                    Violation(
+                        DATASET_FILE,
+                        "row_bad_id",
+                        f"{where}: id '{incident}' is not INC-<digits>",
+                    )
                 )
             if incident and incident in seen:
                 violations.append(
-                    Violation(DATASET_FILE, "row_duplicate_id", f"{where}: id '{incident}' repeats")
+                    Violation(
+                        DATASET_FILE,
+                        "row_duplicate_id",
+                        f"{where}: id '{incident}' repeats",
+                    )
                 )
             seen.add(incident)
             if vocab is not None:
                 for column, vocabulary, code in (
                     ("stage", "stage", "row_stage_not_in_vocabulary"),
-                    ("evidence_strength", "evidence_strength", "row_evidence_strength_not_in_vocabulary"),
+                    (
+                        "evidence_strength",
+                        "evidence_strength",
+                        "row_evidence_strength_not_in_vocabulary",
+                    ),
                 ):
                     value = fields.get(column, "")
                     if value and value not in vocab[vocabulary]:
@@ -268,7 +286,11 @@ def _check_protections(rel: str, section: str, violations: list[Violation]) -> N
     rungs = list(_RUNG_RE.finditer(section))
     if not rungs:
         violations.append(
-            Violation(rel, "protections_no_rungs", f"{rel}: Protections has no '### <rung>' heading")
+            Violation(
+                rel,
+                "protections_no_rungs",
+                f"{rel}: Protections has no '### <rung>' heading",
+            )
         )
     for i, rung in enumerate(rungs):
         name = rung.group(1)
@@ -281,7 +303,11 @@ def _check_protections(rel: str, section: str, violations: list[Violation]) -> N
         ):
             if not _field(text, label):
                 violations.append(
-                    Violation(rel, code, f"{rel}: rung '{name}' has no '{label}' line with a value")
+                    Violation(
+                        rel,
+                        code,
+                        f"{rel}: rung '{name}' has no '{label}' line with a value",
+                    )
                 )
         cost = _field(text, "Cost")
         if cost and re.search(r"\d", cost) and not _DATED_SOURCE_RE.search(cost):
@@ -364,7 +390,9 @@ def _check_class_doc(
     surfaces_at = fields.get("surfaces_at")
     if surfaces_at and not isinstance(surfaces_at, list):
         violations.append(
-            Violation(rel, "surfaces_at_not_list", f"{rel}: 'surfaces_at' must be a list")
+            Violation(
+                rel, "surfaces_at_not_list", f"{rel}: 'surfaces_at' must be a list"
+            )
         )
     elif surfaces_at and vocab is not None:
         for value in surfaces_at:
@@ -381,14 +409,22 @@ def _check_class_doc(
         cross_cutting = fields["scope"] == CROSS_CUTTING
         if not cross_cutting:
             violations.append(
-                Violation(rel, "scope_invalid", f"{rel}: 'scope' may only be '{CROSS_CUTTING}'")
+                Violation(
+                    rel,
+                    "scope_invalid",
+                    f"{rel}: 'scope' may only be '{CROSS_CUTTING}'",
+                )
             )
     frontmatter_end = text.find("\n---", 4) if text.startswith("---\n") else -1
     sections = _sections(text[frontmatter_end:] if frontmatter_end != -1 else text)
     for name in REQUIRED_SECTIONS:
         if name.lower() not in sections:
             violations.append(
-                Violation(rel, f"doc_missing_section:{name}", f"{rel} has no '## {name}' section")
+                Violation(
+                    rel,
+                    f"doc_missing_section:{name}",
+                    f"{rel} has no '## {name}' section",
+                )
             )
     doc_class = fields.get("class")
     if "examples" in sections:
@@ -444,7 +480,11 @@ def check_tree(root: Path) -> list[Violation]:
                     f"scanned directory {directory} does not exist",
                 )
             )
-    classes = _check_dataset(root, vocab, violations) if (root / DATASET_DIR).is_dir() else None
+    classes = (
+        _check_dataset(root, vocab, violations)
+        if (root / DATASET_DIR).is_dir()
+        else None
+    )
     if definition is not None:
         _check_class_docs(root, definition, vocab, classes, violations)
     return violations

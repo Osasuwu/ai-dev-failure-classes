@@ -17,7 +17,9 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).parent.parent
-WORKFLOW = (ROOT / ".github" / "workflows" / "quote-cron.yml").read_text(encoding="utf-8")
+WORKFLOW = (ROOT / ".github" / "workflows" / "quote-cron.yml").read_text(
+    encoding="utf-8"
+)
 
 
 def _script() -> str:
@@ -27,7 +29,10 @@ def _script() -> str:
 
 
 def _run_block() -> str:
-    match = re.search(r"- name: Check quotes in every doc\n        run: \|\n((?:(?: {10}.*)?\n)+)", WORKFLOW)
+    match = re.search(
+        r"- name: Check quotes in every doc\n        run: \|\n((?:(?: {10}.*)?\n)+)",
+        WORKFLOW,
+    )
     assert match, "check step missing"
     return textwrap.dedent(match.group(1))
 
@@ -80,7 +85,11 @@ def test_permissions_are_contents_read_and_issues_write():
 
 
 def test_runs_are_serialized():
-    assert re.search(r"^concurrency:\n  group: quote-cron\n  cancel-in-progress: false", WORKFLOW, re.M)
+    assert re.search(
+        r"^concurrency:\n  group: quote-cron\n  cancel-in-progress: false",
+        WORKFLOW,
+        re.M,
+    )
 
 
 def test_script_does_not_interpolate_expressions_into_the_script_source():
@@ -107,7 +116,13 @@ def test_every_pathspec_matches_a_doc_and_fixtures_are_left_out():
 
 def test_the_list_check_catches_a_new_doc_directory(tmp_path):
     subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
-    for rel in ("README.md", "docs/a.md", "docs/sub/b.md", "tests/fixtures/bad.md", "guides/new.md"):
+    for rel in (
+        "README.md",
+        "docs/a.md",
+        "docs/sub/b.md",
+        "tests/fixtures/bad.md",
+        "guides/new.md",
+    ):
         path = tmp_path / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("x\n", encoding="utf-8")
@@ -117,13 +132,17 @@ def test_the_list_check_catches_a_new_doc_directory(tmp_path):
 
 # --- the shell step -------------------------------------------------------
 
+
 def _find_bash() -> str | None:
     """bash on PATH; on Windows, Git's bash (PATH often has WSL's first, which sees other paths)."""
     if os.name != "nt":
         return shutil.which("bash")
     git = shutil.which("git")
     if git:
-        for candidate in (Path(git).parent.parent / "bin" / "bash.exe", Path(git).parent / "bash.exe"):
+        for candidate in (
+            Path(git).parent.parent / "bin" / "bash.exe",
+            Path(git).parent / "bash.exe",
+        ):
             if candidate.exists():
                 return str(candidate)
     return None
@@ -139,14 +158,21 @@ def _run_step(tmp_path: Path, rc: int):
         pytest.skip("bash not installed")
     repo = tmp_path / "repo"
     subprocess.run(["git", "init", "-q", str(repo)], check=True)
-    for rel in ("README.md", "docs/with space.md", "docs/sub/b.md", "tests/fixtures/x.md"):
+    for rel in (
+        "README.md",
+        "docs/with space.md",
+        "docs/sub/b.md",
+        "tests/fixtures/x.md",
+    ):
         path = repo / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("x\n", encoding="utf-8")
     _git(repo, "add", "-A")
     args_file = tmp_path / "args.txt"
     # A stand-in for the real script: record the arguments, exit with the given code.
-    stub = f'python() {{ printf "%s\\n" "$@" > "{args_file.as_posix()}"; return {rc}; }}\n'
+    stub = (
+        f'python() {{ printf "%s\\n" "$@" > "{args_file.as_posix()}"; return {rc}; }}\n'
+    )
     step = tmp_path / "step.sh"
     # GitHub runs a `run:` block as `bash -e {0}`.
     step.write_text("set -e\n" + stub + _run_block(), encoding="utf-8", newline="\n")
@@ -156,7 +182,9 @@ def _run_step(tmp_path: Path, rc: int):
     proc = subprocess.run(
         [BASH, step.as_posix()], cwd=repo, env=env, capture_output=True, text=True
     )
-    args = args_file.read_text(encoding="utf-8").splitlines() if args_file.exists() else []
+    args = (
+        args_file.read_text(encoding="utf-8").splitlines() if args_file.exists() else []
+    )
     return proc.returncode, args
 
 
@@ -222,18 +250,26 @@ const core = { info: () => {}, setFailed: (m) => { out.failed = m; }, summary };
 TITLE = "Weekly quote check: NOT FOUND quotes"
 
 
-def _finding(verdict="NOT FOUND", unfetched=(), doc="docs/a.md", quote="exit code two blocks"):
+def _finding(
+    verdict="NOT FOUND", unfetched=(), doc="docs/a.md", quote="exit code two blocks"
+):
     return {
-        "doc": doc, "line": 7, "verdict": verdict, "quote": quote,
-        "tried": ["https://a.example", *unfetched], "unfetched": list(unfetched),
+        "doc": doc,
+        "line": 7,
+        "verdict": verdict,
+        "quote": quote,
+        "tried": ["https://a.example", *unfetched],
+        "unfetched": list(unfetched),
     }
 
 
 def _report(*findings, unfetchable=()):
     return {
-        "docs": 31, "quotes": 270,
+        "docs": 31,
+        "quotes": 270,
         "not_found": sum(f["verdict"] == "NOT FOUND" for f in findings),
-        "unfetchable_sources": list(unfetchable), "findings": list(findings),
+        "unfetchable_sources": list(unfetchable),
+        "findings": list(findings),
     }
 
 
@@ -253,7 +289,9 @@ def _run(tmp_path, report, open_issues=(), check=True):
     proc = subprocess.run(
         [node, "-e", HARNESS.replace("__SCRIPT__", _script())],
         input=json.dumps({"open": list(open_issues)}),
-        capture_output=True, text=True, encoding="utf-8",
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
         env={**os.environ, "REPORT": str(path)},
     )
     if not check:
@@ -274,7 +312,9 @@ def test_not_found_opens_the_issue_and_fails_the_job(tmp_path):
     assert [c["title"] for c in out["created"]] == [TITLE]
     [comment] = out["comments"]
     assert comment["issue_number"] == 900
-    assert "`docs/a.md:7`" in comment["body"] and "exit code two blocks" in comment["body"]
+    assert (
+        "`docs/a.md:7`" in comment["body"] and "exit code two blocks" in comment["body"]
+    )
     assert "https://github.com/o/r/actions/runs/42" in comment["body"]
     assert out["updates"] == []
     assert out["failed"] and "1 quote(s) NOT FOUND" in out["failed"]
@@ -297,14 +337,25 @@ def test_clean_run_closes_the_open_issue_with_a_comment(tmp_path):
     [comment] = out["comments"]
     assert comment["issue_number"] == 30 and "Clean run" in comment["body"]
     assert out["updates"] == [
-        {"owner": "o", "repo": "r", "issue_number": 30, "state": "closed", "state_reason": "completed"}
+        {
+            "owner": "o",
+            "repo": "r",
+            "issue_number": 30,
+            "state": "closed",
+            "state_reason": "completed",
+        }
     ]
     assert out["failed"] is None
 
 
 def test_clean_run_without_an_open_issue_does_nothing(tmp_path):
     out = _run(tmp_path, _report())
-    assert (out["created"], out["comments"], out["updates"], out["failed"]) == ([], [], [], None)
+    assert (out["created"], out["comments"], out["updates"], out["failed"]) == (
+        [],
+        [],
+        [],
+        None,
+    )
 
 
 def test_unfetchable_sources_do_not_open_the_issue_and_are_counted(tmp_path):
@@ -319,7 +370,8 @@ def test_unfetchable_sources_do_not_open_the_issue_and_are_counted(tmp_path):
 
 def test_not_found_with_an_unfetched_candidate_does_not_touch_the_issue(tmp_path):
     report = _report(
-        _finding(unfetched=["https://down.example"]), unfetchable=["https://down.example"]
+        _finding(unfetched=["https://down.example"]),
+        unfetchable=["https://down.example"],
     )
     for open_issues in ((), OPEN):
         out = _run(tmp_path, report, open_issues)
