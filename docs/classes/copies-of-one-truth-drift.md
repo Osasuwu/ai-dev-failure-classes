@@ -7,7 +7,7 @@ surfaces_at:
   - review
   - after-merge
 applies_when: An AI coding agent edits a codebase where one fact is written down in more than one place (a duplicated function, a new version kept beside the old one, a constant or list repeated across files, a producer and a consumer that each encode the same format, a config or workflow copied between repositories, a template and the files made from it), and you want to know why a change or a fix lands in one copy and not the others, and what keeps the copies in step.
-applies_when_not: Two agents or sessions writing the same file or state at the same time (shared state without ownership). A rule or lesson that exists but never reaches the agent at the point of action. A fact the agent states without checking it (claims from plausibility). A test whose expected value is copied from the code it tests, so it cannot fail (that is its own class). An environment that differs from the one tested.
+applies_when_not: Two agents or sessions writing the same file or state at the same time (shared state without ownership). A rule or lesson that exists but never reaches the agent at the point of action. A fact the agent states without checking it (claims from plausibility). A test whose expected value is copied from the code it tests, so it cannot fail (tests that cannot fail). An environment that differs from the one tested.
 ---
 
 # Copies of one truth drift
@@ -26,7 +26,7 @@ The INC- codes are rows in [the incident dataset](../../incidents/incidents.csv)
 
 - INC-181: a user reports that Claude Code keeps writing the same constant or path into several files instead of one ([anthropics/claude-code#37137](https://github.com/anthropics/claude-code/issues/37137)): "A bug in the shared value now requires fixing it in multiple places — and Claude may only fix one of them."
 - INC-161: an agent fixed a parsing bug in one function of a media-session gate; review found, a round later, that its sibling function sharing the same logic still had the old behaviour.
-- INC-169: one counter was written by three halves of an app (Dart, Kotlin, Python). They disagreed on cell type, row lookup and de-duplication, and user counts were undercounted for good; a parity test covered the sheet's header columns, and nothing checked the value types.
+- INC-169: one counter, kept in a spreadsheet, was written by three halves of an app (Dart, Kotlin, Python). They disagreed on cell type, row lookup and de-duplication, and user counts were undercounted for good; a parity test covered the sheet's header columns, and nothing checked the value types.
 - INC-165: a review gate copied into two repositories had the same fail-open hole. It was fixed in one repository and never ported, and the other kept passing PRs with no review verdict until a cross-repository comparison found it.
 - INC-159: a merge-hold check was deleted, and the documentation agents read still described it as live, so agents relied on a label that nothing enforced.
 
@@ -52,7 +52,7 @@ The class is spread across stages, and no single gate covers it: the copy that w
 
 ## Protections
 
-The rungs below either help the agent find copies or compare copies that were declared. One operator's record of 31 incidents of this class has no patch that compares copies: no parity test across twins, no reference check on deletion, no shared schema between producer and consumer. The checks that held in that record guard the merge machinery's own behaviour (fail closed, required checks), not copy agreement (as of 2026-10, private audit). The search of public tools, docs and studies behind this doc (its queries are listed in the pull request that added it) found no mechanism that finds an undeclared copy that no longer looks like the others and checks that a fix reached it; clone detection covers copies that still look alike. That gap is open; the ladder does not fill it.
+The rungs below either help the agent find copies or compare copies that were declared. One operator's record of 31 incidents of this class has no patch that compares copies: no parity test across twins, no reference check on deletion, no shared schema between producer and consumer. The checks that held in that record guard the merge machinery's own behaviour (fail closed, required checks), not copy agreement (as of 2026-10, private audit). The search of public tools, docs and studies behind this doc (its queries are listed in [the pull request that added it](https://github.com/Osasuwu/jarvis-oss/pull/306)) found no mechanism that finds an undeclared copy that no longer looks like the others and checks that a fix reached it; clone detection covers copies that still look alike. That gap is open; the ladder does not fill it.
 
 ### Prompt: tell the agent to look for siblings before it fixes or writes
 
@@ -100,7 +100,7 @@ The rungs below either help the agent find copies or compare copies that were de
 
 - **Source:** [cog](https://cog.readthedocs.io/en/latest/running.html): "You can use the `--check` option to run cog just to check that the files would not change if run again."; [embedme](https://github.com/zakhenry/embedme) verifies code blocks in markdown against their source files; Kubernetes runs [verify-codegen.sh](https://github.com/kubernetes/kubernetes/blob/master/hack/verify-codegen.sh) to fail when committed generated code is out of date.
 - **Cost:** a generator and a CI step.
-- **Breaks when:** a copy is written by hand outside what the generator writes; the check re-runs the generator, so that copy is never compared. A check that is not wired into CI does not run.
+- **Breaks when:** a copy is written by hand outside what the generator writes. [cog's check](https://cog.readthedocs.io/en/latest/running.html) asks only whether "the files would not change if run again", so a copy the generator never writes is never compared. A check that is not wired into CI does not run.
 
 ### Check copied templates and configs against their source
 
