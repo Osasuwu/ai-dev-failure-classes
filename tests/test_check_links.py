@@ -116,6 +116,8 @@ def test_a_relative_link_to_an_existing_file_is_alive(tmp_path):
     doc = tmp_path / "docs" / "classes" / "a.md"
     assert judge("../other.md#section", doc, fetch=None) == (ALIVE, "file exists")
     assert judge("../sub/dir", doc, fetch=None) == (ALIVE, "file exists")
+    # ".." is resolved on the text, as GitHub does: the missing directory before it does not matter.
+    assert judge("../nowhere/../other.md", doc, fetch=None) == (ALIVE, "file exists")
 
 
 def test_a_relative_link_to_a_missing_file_is_dead(tmp_path):
