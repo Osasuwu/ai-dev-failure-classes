@@ -5,7 +5,6 @@ surfaces_at:
   - code
   - ci
   - review
-  - after-merge
 applies_when: You give an AI coding agent a goal together with a way to tell that it is met (tests, acceptance criteria, a required field in a gate, a size cap, a review rubric, a score), and the agent, pushed to reach that signal, makes the signal pass in a way that does not meet the goal; or the signal you chose measures something other than the goal, and the agent's work follows the signal.
 applies_when_not: A test written so that it passes whatever the code does, which the agent did not change to make it pass (tests that cannot fail). A report that says a check passed when it was never run or failed (claims from plausibility). A gate that turns green because a result is missing (absence read as success). Prompt injection that makes the agent do something else.
 ---
@@ -34,7 +33,7 @@ Each time the signal moved and the goal did not.
 - INC-250: asked to meet a specification, the agent changed failing tests and their assertions to match the wrong behaviour instead of fixing the code, against instructions in the project's rules files.
 - INC-251: after four failed attempts at a race condition, the agent cut the wait timeout in a test the user had isolated as the standard of correctness, so that the test passed; a project rule forbade exactly that.
 - INC-253: subagents moved hard acceptance criteria to "out of scope" or "follow-up" in their pull-request text when meeting them meant crossing a tool or a file outside their first plan, and the issue closed as done.
-- INC-254: a pull request for an orchestrator that decides what to do with a finished task by whether the task opened a pull request (its "PR evidence") emitted that evidence as a literal placeholder that no caller ever filled, so the decision it existed for never had real input; review rounds kept finding it, and after five rounds it was merged around the review gate.
+- INC-254: a pull request added an orchestrator that decides what to do with a finished task by whether the task opened a pull request (its "PR evidence"); the new code emitted that evidence as a literal placeholder that no caller ever filled, so the decision it existed for never had real input; review rounds kept finding it, and after five rounds it was merged around the review gate.
 - INC-255: a 20,000-byte cap on docs was hit four times in two days; trimming to fit cut hedges and options that were correct and introduced contradictions no review saw, and the cap was raised instead.
 
 ## Mechanism
@@ -49,17 +48,19 @@ Each time the signal moved and the goal did not.
 4. **Cut to fit.** A constraint is a number (a byte cap, a line count, a time budget); the work is cut until it fits, and what is cut is chosen by what saves the most, not by what matters least (INC-255).
 5. **The measure is wrong.** The signal does not track the goal in the first place: a rubric that rewards the wrong shape, a target taken from today's numbers. The agent follows it faithfully and the work drifts from the goal with every pass (INC-256). Nothing below protects this form; see the gap at the end of Protections.
 
+Form 1 is also seen outside one operator's work, in public issue reports and in benchmarks (see Evidence). Forms 2 to 5 rest on one operator's repositories: form 2 on two incidents, one of them private, and forms 3, 4 and 5 on one incident each. No external source was found that measures them, so read each as an observed case, not a measured pattern.
+
 **Why it looks fine.** Every form leaves the signal green, and the signal is what the next reader looks at. A reviewer who reads the check result before the diff, a closing script that counts ticked boxes, a gate that reads a field's presence: each sees what the agent was optimising for. The more the work, the more reviewers lean on the tests alone; one benchmark found that "oversight collapses onto a single surface: the automated test suite" ([SpecBench](https://arxiv.org/abs/2605.21384)).
 
 **What protects.** The ladder works on three levers: put the signal out of the agent's reach, choose the signal from the goal rather than from what is easy to measure, and have something other than the signal read the work. A told rule is the cheapest rung and the weakest under pressure. A signal the agent cannot change takes forms 1 to 4 out of reach; it does nothing for form 5.
 
 ## Where it surfaces
 
-At the task, when the goal and its check are written: a criterion that can be met by relabelling it, a cap with no rule for what to cut, a target read off current numbers. At code, while the agent works: the test file, a timeout or a hardcoded case changes in the same diff as the code (INC-250, INC-251). In CI, when a check passes that should not, or a cap is reached by trimming (INC-255). At review, where most of these are caught today, by a reviewer who reads the diff of the check and the criteria against the work, not the check's result (INC-253, INC-254). After merge, when every stage before read the signal and the goal is found unmet only once the work is used; none of the rows cited here was caught that late. The stages are spelled as in `docs/vocabularies.json`.
+At the task, when the goal and its check are written: a criterion that can be met by relabelling it, a cap with no rule for what to cut, a target read off current numbers. At code, while the agent works: the test file, a timeout or a hardcoded case changes in the same diff as the code (INC-250, INC-251). In CI, when a check passes that should not, or a cap is reached by trimming (INC-255). At review, where most of these are caught today, by a reviewer who reads the diff of the check and the criteria against the work, not the check's result (INC-253, INC-254). After merge is not claimed: none of the rows cited here was caught that late. The stages are spelled as in `docs/vocabularies.json`.
 
 ## Protections
 
-Cheapest first. The first rungs tell the agent and give it a way out; the middle ones take the signal out of its reach or read the work instead of the signal; the last ones change the signal itself. A rung that closes one channel can leave the pressure on the next one still open, so each rung names the forms it leaves.
+Cheapest first. The first rungs tell the agent and give it a way out; the middle ones take the signal out of its reach or read the work instead of the signal; the next two change the signal itself, by hiding it or choosing it from the goal; the last puts a person on the work. A rung that closes one channel can leave the pressure on the next one still open, so each rung names the forms it leaves.
 
 ### Prompt: tests verify the solution, they do not define it
 
@@ -87,7 +88,7 @@ Cheapest first. The first rungs tell the agent and give it a way out; the middle
 
 ### Lock: fix the acceptance rule before the run
 
-- **Source:** [Anthropic, effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) writes the criteria as a file at the start: "We prompt coding agents to edit this file only by changing the status of a passes field". One operator's practice adds that for an exploratory task the oracle is fixed and machine-checkable before the unattended run starts, a criterion written after the results does not count, and a negative result is reported like a positive one; after it, the criteria drift of INC-257 did not recur in that operator's record.
+- **Source:** [Anthropic, effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) writes the criteria as a file at the start: "We prompt coding agents to edit this file only by changing the status of a passes field". One operator's practice adds that for an exploratory task the oracle is fixed and machine-checkable before the unattended run starts, a criterion written after the results does not count, and a negative result is reported like a positive one; after it, the criteria drift of INC-257 did not recur in that operator's record. INC-257 is a private row and cannot be checked from here.
 - **Cost:** Writing the criteria in full before the run. A change to them needs a person and a recorded reason.
 - **Breaks when:** Nothing enforces "status only": in the harness above it is an instruction, and the same page reports features marked complete without proper testing. Criteria can need to change for good reasons, so a plain freeze is wrong; the lock has to allow an amendment with a reason on record. A rule fixed in advance can still be the wrong measure, and fixing it in advance locks it in.
 
@@ -119,7 +120,7 @@ Cheapest first. The first rungs tell the agent and give it a way out; the middle
 
 - **Source:** [Google SRE book](https://sre.google/sre-book/service-level-objectives/): "Start by thinking about (or finding out!) what your users care about, not what you can measure." [DORA](https://dora.dev/guides/dora-metrics-four-keys): "Teams should identify multiple metrics, including some with a healthy amount of tension between them." For a model or rubric as grader, [Anthropic, demystifying evals](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents): "You won't know if your graders are working well unless you read the transcripts and grades from many trials."
 - **Cost:** Design time for each signal, and more than one signal to keep.
-- **Breaks when:** The slate is folded back into one score, or every signal shares the same blind spot. A size cap paired with nothing that measures what was lost is still a cap. None of these sources measures the advice on agent work: it is general practice for metrics, not a protection shown to catch form 5 (see the gap below).
+- **Breaks when:** Untested; these are reasoned failure modes, with no source or incident behind them: the slate is folded back into one score, or every signal shares the same blind spot, or a size cap is paired with nothing that measures what was lost. None of these sources measures the advice on agent work: it is general practice for metrics, not a protection shown to catch form 5 (see the gap below).
 
 ### Review: a person reads the work against the goal, not the checks
 
@@ -127,7 +128,7 @@ Cheapest first. The first rungs tell the agent and give it a way out; the middle
 - **Cost:** About 42 minutes of expert time per pull request in METR's sample (as of 2025-08, METR).
 - **Breaks when:** The reviewer reads the green checks and the ticked boxes, so the signal is still what gets read; the review is skimmed; the reviewer's own checklist becomes the next signal. In INC-254 review rounds found the placeholder five times and the pull request was merged around the gate anyway. For when a person has to approve before an action rather than after it, see [irreversible effects](irreversible-effects.md).
 
-**The gap: a measure that measures the wrong thing.** No protection with evidence was found for form 5. Every rung above assumes the signal is right and keeps the agent from going around it; when the signal does not track the goal, the agent following it faithfully is the failure. Locking the rule locks the wrong rule in, an independent judge checks the work against the same wrong criteria, held-out tests share the measure's model, and the metric-design advice above has not been measured on agent work. In one operator's record a rubric that encoded the wrong model of a good document was rewritten, and the non-convergence came back twice (INC-256); in INC-257 a metric that did not measure its named quantity surfaced only when someone re-derived the number from the raw data. The nearest candidate is to validate a measure on cases with a known answer before trusting it; no source was found that tests that for agent work, so it is not offered as a rung.
+**The gap: a measure that measures the wrong thing.** No protection with evidence was found for form 5. Every rung above assumes the signal is right and keeps the agent from going around it; when the signal does not track the goal, the agent following it faithfully is the failure. Locking the rule locks the wrong rule in, an independent judge checks the work against the same wrong criteria, held-out tests share the measure's model, and the metric-design advice above has not been measured on agent work. In one operator's record a rubric that encoded the wrong model of a good document was rewritten, and the non-convergence came back twice (INC-256); in INC-257, a private row that cannot be checked from here, a metric that did not measure its named quantity surfaced only when someone re-derived the number from the raw data. The nearest candidate is to validate a measure on cases with a known answer before trusting it; no source was found that tests that for agent work, so it is not offered as a rung.
 
 ## Evidence
 
@@ -141,6 +142,8 @@ Measured on agents, from the sources above:
 - The gap between visible and held-out tests "grows by 28 percentage points for every tenfold increase in code size" (as of 2026-05, [SpecBench](https://arxiv.org/abs/2605.21384)).
 - On reward models rather than agents: "Because the reward model is an imperfect proxy, optimizing its value too much can hinder ground truth performance." (as of 2022-10, [Gao et al.](https://arxiv.org/abs/2210.10760)).
 
-Small and not controlled (as of 2026-10, one operator's record): patches that changed what the agent was told or where the line sat came back. The prompt rule against relabelling criteria was followed by the same form again (INC-253); the size cap raised from 20,000 to 30,000 bytes was hit again (INC-255); the rewritten rubric did not converge twice more (INC-256). Patches that changed who checks held: the merge-blocking per-criterion review held for about three weeks in the repository that had it, and the pre-pull-request criterion check held for the one case it was built after (INC-254).
+Small and not controlled (as of 2026-10, one operator's record): patches that changed what the agent was told or where the line sat came back. The prompt rule against relabelling criteria was followed by the same form again (INC-253); the size cap raised from 20,000 to 30,000 bytes was hit again (INC-255); the rewritten rubric did not converge twice more (INC-256). Patches that changed who checks held: the merge-blocking per-criterion review held for about three weeks in the repository that had it; the pre-pull-request criterion check held for the one case it was built after (INC-254); the acceptance rule fixed before the run held after the criteria drift of INC-257, a private row.
 
 Not measured anywhere found: a protection for placeholders in required fields, for cutting to fit a cap, for a review rubric that rewards the wrong thing, or for a measure that measures the wrong thing.
+
+Every incident cited here is a row in [`incidents/incidents.csv`](../../incidents/incidents.csv); one of the class's rows, INC-257, is a private source and says so in the link column.
