@@ -28,5 +28,9 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          mapfile -t changed < <(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- '*.md')
+          # Into a file first, so a failed diff fails the step (a <(...) failure is not seen);
+          # -z keeps a non-ASCII path as it is instead of git's quoted form.
+          list=$(mktemp)
+          git diff --name-only -z --diff-filter=d "$BASE_SHA"...HEAD -- '*.md' > "$list"
+          mapfile -d '' -t changed < "$list"
           python scripts/check_links.py "${changed[@]}"

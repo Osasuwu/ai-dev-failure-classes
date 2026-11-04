@@ -11,9 +11,13 @@ import json
 import os
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import textwrap
+import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 import pytest
@@ -158,6 +162,123 @@ def test_a_link_of_another_scheme_is_not_verified(tmp_path, url):
     )
 
 
+# --- the fetch: urllib replaced, nothing goes to the network --------------------
+
+URL = "https://example.org/page"
+
+
+class _Response:
+    """What urlopen returns once the redirects are followed: the status and the final URL."""
+
+    def __init__(self, status: int, url: str):
+        self.status, self.url = status, url
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def _urlopen(monkeypatch, outcomes: list[object]) -> list[str]:
+    """Replace urlopen: call k gets outcomes[k], returned or raised. Returns the requested URLs."""
+    calls: list[str] = []
+
+    def urlopen(request, timeout):
+        calls.append(request.full_url)
+        outcome = outcomes[len(calls) - 1]
+        if isinstance(outcome, BaseException):
+            raise outcome
+        return outcome
+
+    monkeypatch.setattr(urllib.request, "urlopen", urlopen)
+    monkeypatch.setattr(time, "sleep", lambda seconds: None)
+    return calls
+
+
+def _dns_error(errno: int) -> urllib.error.URLError:
+    return urllib.error.URLError(socket.gaierror(errno, "lookup failed"))
+
+
+@pytest.mark.parametrize(
+    "final",
+    [URL, "https://www.example.org/page/", "https://example.org/docs/login-flow-guide"],
+)
+def test_a_page_that_answers_200_after_an_ordinary_redirect_is_alive(
+    tmp_path, monkeypatch, final
+):
+    calls = _urlopen(monkeypatch, [_Response(200, final)])
+    assert judge(URL, tmp_path / "doc.md") == (ALIVE, "HTTP 200")
+    assert calls == [URL]
+
+
+@pytest.mark.parametrize(
+    "code,state", [(404, DEAD), (410, DEAD), (403, NOT_VERIFIED), (500, NOT_VERIFIED)]
+)
+def test_an_error_status_is_read_from_the_http_error(
+    tmp_path, monkeypatch, code, state
+):
+    _urlopen(monkeypatch, [urllib.error.HTTPError(URL, code, "status", {}, None)])
+    assert judge(URL, tmp_path / "doc.md") == (state, f"HTTP {code}")
+
+
+@pytest.mark.parametrize(
+    "final",
+    [
+        "https://github.com/login?return_to=%2Fsettings%2Fprofile",
+        "https://accounts.example.com/ServiceLogin?continue=x",
+        "https://example.org/users/sign_in",
+        "https://example.org/account/signin.aspx",
+        "https://login.example.net/common/oauth2/authorize?client_id=x",
+    ],
+)
+def test_a_redirect_that_ends_on_a_sign_in_page_is_not_verified(
+    tmp_path, monkeypatch, final
+):
+    _urlopen(monkeypatch, [_Response(200, final)])
+    assert judge(URL, tmp_path / "doc.md") == (
+        NOT_VERIFIED,
+        "redirected to a sign-in page",
+    )
+
+
+def test_a_sign_in_page_linked_directly_is_alive(tmp_path, monkeypatch):
+    # No redirect: the doc links the sign-in page itself, and the page it names answered.
+    login = "https://github.com/login"
+    _urlopen(monkeypatch, [_Response(200, login)])
+    assert judge(login, tmp_path / "doc.md") == (ALIVE, "HTTP 200")
+
+
+def test_a_host_that_does_not_resolve_twice_is_dead(tmp_path, monkeypatch):
+    calls = _urlopen(
+        monkeypatch, [_dns_error(socket.EAI_NONAME), _dns_error(socket.EAI_NONAME)]
+    )
+    assert judge(URL, tmp_path / "doc.md") == (DEAD, "host does not resolve")
+    assert calls == [URL, URL]
+
+
+def test_a_host_that_resolves_on_the_retry_is_judged_by_its_status(
+    tmp_path, monkeypatch
+):
+    calls = _urlopen(monkeypatch, [_dns_error(socket.EAI_NONAME), _Response(200, URL)])
+    assert judge(URL, tmp_path / "doc.md") == (ALIVE, "HTTP 200")
+    assert calls == [URL, URL]
+
+
+def test_a_temporary_dns_failure_is_not_verified(tmp_path, monkeypatch):
+    calls = _urlopen(
+        monkeypatch, [_dns_error(socket.EAI_AGAIN), _dns_error(socket.EAI_AGAIN)]
+    )
+    assert judge(URL, tmp_path / "doc.md") == (NOT_VERIFIED, "URLError")
+    assert calls == [URL, URL]
+
+
+def test_a_refused_connection_is_not_verified_and_not_retried(tmp_path, monkeypatch):
+    calls = _urlopen(monkeypatch, [urllib.error.URLError(ConnectionRefusedError())])
+    assert judge(URL, tmp_path / "doc.md") == (NOT_VERIFIED, "URLError")
+    assert calls == [URL]
+
+
 # --- the run -----------------------------------------------------------------
 
 
@@ -230,6 +351,59 @@ def test_links_in_code_and_anchors_are_not_links(tmp_path, monkeypatch, capsys):
     code, out = _run(tmp_path, monkeypatch, capsys, {"docs/a.md": body}, {})
     assert code == 0
     assert out.splitlines()[-1].startswith("1 file(s), 0 link(s)")
+
+
+def test_a_url_inside_inline_code_is_not_a_link(tmp_path, monkeypatch, capsys):
+    body = (
+        "Write `https://github.com/<owner>/<repo>` or ``[x](https://code.example/y)``; "
+        "the [`flag`](https://a.example/x) link is real.\n"
+    )
+    code, out = _run(
+        tmp_path, monkeypatch, capsys, {"docs/a.md": body}, {"https://a.example/x": 200}
+    )
+    assert code == 0
+    assert out.splitlines()[1:] == [
+        "docs/a.md:1: alive: https://a.example/x (HTTP 200)",
+        "1 file(s), 1 link(s): 1 alive, 0 dead, 0 not verified "
+        "(not verified is not a failure; open those by hand)",
+    ]
+
+
+def test_a_bare_url_is_reported_without_the_markup_around_it(
+    tmp_path, monkeypatch, capsys
+):
+    body = (
+        "See **https://a.example/x**. Also 'https://b.example/x' and (https://c.example/x), "
+        "and https://en.wikipedia.org/wiki/Foo_(bar).\n"
+    )
+    urls = [
+        "https://a.example/x",
+        "https://b.example/x",
+        "https://c.example/x",
+        "https://en.wikipedia.org/wiki/Foo_(bar)",
+    ]
+    code, out = _run(
+        tmp_path, monkeypatch, capsys, {"docs/a.md": body}, dict.fromkeys(urls, 200)
+    )
+    assert code == 0
+    assert out.splitlines()[1:-1] == [
+        f"docs/a.md:1: alive: {url} (HTTP 200)" for url in urls
+    ]
+
+
+def test_an_angle_bracket_target_is_checked_without_its_brackets(
+    tmp_path, monkeypatch, capsys
+):
+    files = {
+        "docs/a.md": "[x](<https://a.example/x>) and [y](<b.md>)\n",
+        "docs/b.md": "b\n",
+    }
+    code, out = _run(tmp_path, monkeypatch, capsys, files, {"https://a.example/x": 200})
+    assert code == 0
+    assert out.splitlines()[1:3] == [
+        "docs/a.md:1: alive: https://a.example/x (HTTP 200)",
+        "docs/a.md:1: alive: b.md (file exists)",
+    ]
 
 
 def test_files_outside_the_path_definition_are_not_checked(
@@ -355,7 +529,7 @@ def test_no_workflow_runs_the_link_check_on_a_schedule():
         ), path.name
 
 
-def test_the_check_is_named_for_links_and_claims_nothing_about_content():
+def test_the_workflow_and_job_are_named_link_check():
     assert re.search(r"^name: (.+)$", WORKFLOW, re.M).group(1) == "Link check"
     assert re.search(r"^jobs:\n  (\S+):$", WORKFLOW, re.M).group(1) == "link-check"
 
