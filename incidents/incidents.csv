@@ -62,3 +62,19 @@ INC-060,absence-read-as-success,review,issue,primary,https://github.com/anthropi
 INC-061,absence-read-as-success,review,issue,primary,https://github.com/anthropics/claude-code/issues/59712
 INC-062,absence-read-as-success,review,issue,primary,https://github.com/anthropics/claude-code-action/issues/1361
 INC-063,absence-read-as-success,review,issue,primary,https://github.com/jadedm/claude-review-action/issues/15
+INC-200,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/955
+INC-201,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1104
+INC-202,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1101
+INC-203,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1479
+INC-204,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1764
+INC-205,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/163
+INC-206,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/168
+INC-207,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/170
+INC-208,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/183
+INC-209,silent-fallback,code,issue,private,"private, not verifiable"
+INC-210,silent-fallback,code,issue,private,"private, not verifiable"
+INC-211,silent-fallback,code,issue,private,"private, not verifiable"
+INC-212,silent-fallback,code,issue,private,"private, not verifiable"
+INC-213,silent-fallback,code,issue,private,"private, not verifiable"
+INC-214,silent-fallback,review,issue,primary,https://github.com/anthropics/claude-code/issues/31890
+INC-215,silent-fallback,code,issue,primary,https://github.com/anthropics/claude-code/issues/21027
