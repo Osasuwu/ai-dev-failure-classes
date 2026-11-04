@@ -204,7 +204,7 @@ def _dns_error(errno: int) -> urllib.error.URLError:
     "final",
     [URL, "https://www.example.org/page/", "https://example.org/docs/login-flow-guide"],
 )
-def test_a_page_that_answers_200_after_an_ordinary_redirect_is_alive(
+def test_a_page_that_answers_200_directly_or_after_an_ordinary_redirect_is_alive(
     tmp_path, monkeypatch, final
 ):
     calls = _urlopen(monkeypatch, [_Response(200, final)])
@@ -230,12 +230,30 @@ def test_an_error_status_is_read_from_the_http_error(
         "https://example.org/users/sign_in",
         "https://example.org/account/signin.aspx",
         "https://login.example.net/common/oauth2/authorize?client_id=x",
+        "https://example.org/wp-login.php?redirect_to=x",
+        "https://www.example.com/authwall?trk=x",
+        "https://example.org/_signin",
+        "https://example.org/logon.aspx",
+        "https://example.org/signon",
+        "https://kc.example.org/realms/r/protocol/openid-connect/auth?client_id=x",
     ],
 )
 def test_a_redirect_that_ends_on_a_sign_in_page_is_not_verified(
     tmp_path, monkeypatch, final
 ):
     _urlopen(monkeypatch, [_Response(200, final)])
+    assert judge(URL, tmp_path / "doc.md") == (
+        NOT_VERIFIED,
+        "redirected to a sign-in page",
+    )
+
+
+def test_a_redirect_to_a_sign_in_page_that_answers_an_error_is_not_verified(
+    tmp_path, monkeypatch
+):
+    # urllib raises the error with the URL the redirects ended on.
+    login = "https://github.com/login?return_to=%2Fx"
+    _urlopen(monkeypatch, [urllib.error.HTTPError(login, 404, "status", {}, None)])
     assert judge(URL, tmp_path / "doc.md") == (
         NOT_VERIFIED,
         "redirected to a sign-in page",
@@ -249,10 +267,12 @@ def test_a_sign_in_page_linked_directly_is_alive(tmp_path, monkeypatch):
     assert judge(login, tmp_path / "doc.md") == (ALIVE, "HTTP 200")
 
 
-def test_a_host_that_does_not_resolve_twice_is_dead(tmp_path, monkeypatch):
-    calls = _urlopen(
-        monkeypatch, [_dns_error(socket.EAI_NONAME), _dns_error(socket.EAI_NONAME)]
-    )
+# EAI_NODATA equals EAI_NONAME on Windows and is missing on some platforms; on Linux it differs.
+@pytest.mark.parametrize(
+    "errno", [socket.EAI_NONAME, getattr(socket, "EAI_NODATA", socket.EAI_NONAME)]
+)
+def test_a_host_that_does_not_resolve_twice_is_dead(tmp_path, monkeypatch, errno):
+    calls = _urlopen(monkeypatch, [_dns_error(errno), _dns_error(errno)])
     assert judge(URL, tmp_path / "doc.md") == (DEAD, "host does not resolve")
     assert calls == [URL, URL]
 
@@ -369,18 +389,38 @@ def test_a_url_inside_inline_code_is_not_a_link(tmp_path, monkeypatch, capsys):
     ]
 
 
+def test_inline_code_inside_a_url_does_not_join_the_text_around_it(
+    tmp_path, monkeypatch, capsys
+):
+    body = "Docs live at https://docs.example.com/`<version>`/guide for each release.\n"
+    code, out = _run(
+        tmp_path,
+        monkeypatch,
+        capsys,
+        {"docs/a.md": body},
+        {"https://docs.example.com/": 200},
+    )
+    assert code == 0
+    assert out.splitlines()[1:-1] == [
+        "docs/a.md:1: alive: https://docs.example.com/ (HTTP 200)"
+    ]
+
+
 def test_a_bare_url_is_reported_without_the_markup_around_it(
     tmp_path, monkeypatch, capsys
 ):
     body = (
         "See **https://a.example/x**. Also 'https://b.example/x' and (https://c.example/x), "
-        "and https://en.wikipedia.org/wiki/Foo_(bar).\n"
+        "and https://en.wikipedia.org/wiki/Foo_(bar). The site (https://d.example/x)'s "
+        "home, and a cell |https://e.example/x|.\n"
     )
     urls = [
         "https://a.example/x",
         "https://b.example/x",
         "https://c.example/x",
         "https://en.wikipedia.org/wiki/Foo_(bar)",
+        "https://d.example/x",
+        "https://e.example/x",
     ]
     code, out = _run(
         tmp_path, monkeypatch, capsys, {"docs/a.md": body}, dict.fromkeys(urls, 200)
@@ -403,6 +443,33 @@ def test_an_angle_bracket_target_is_checked_without_its_brackets(
     assert out.splitlines()[1:3] == [
         "docs/a.md:1: alive: https://a.example/x (HTTP 200)",
         "docs/a.md:1: alive: b.md (file exists)",
+    ]
+
+
+def test_an_angle_bracket_target_with_a_space_is_checked_whole(
+    tmp_path, monkeypatch, capsys
+):
+    files = {
+        "docs/a.md": "[x](<https://a.example/A B>) and [y](<my file.md>)\n",
+        "docs/my file.md": "m\n",
+    }
+    # The fetch gets the space encoded, as a browser sends it.
+    code, out = _run(
+        tmp_path, monkeypatch, capsys, files, {"https://a.example/A%20B": 200}
+    )
+    assert code == 0
+    assert out.splitlines()[1:3] == [
+        "docs/a.md:1: alive: https://a.example/A B (HTTP 200)",
+        "docs/a.md:1: alive: my file.md (file exists)",
+    ]
+
+
+def test_an_empty_angle_bracket_target_is_not_a_link(tmp_path, monkeypatch, capsys):
+    code, out = _run(tmp_path, monkeypatch, capsys, {"docs/a.md": "[x](<>)\n"}, {})
+    assert code == 0
+    assert out.splitlines()[1:] == [
+        "1 file(s), 0 link(s): 0 alive, 0 dead, 0 not verified "
+        "(not verified is not a failure; open those by hand)",
     ]
 
 

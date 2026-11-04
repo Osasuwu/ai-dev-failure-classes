@@ -85,8 +85,15 @@ def _run_step(tmp_path: Path, workflow: str, step: str, base: str, repo: Path):
     script.write_text(
         "set -e\n" + stub + _run_block(workflow, step), encoding="utf-8", newline="\n"
     )
+    # core.quotePath at git's default (true), whatever the machine's config says: the step
+    # must pass a non-ASCII path as it is under the setting a runner has.
     env = dict(
-        os.environ, BASE_SHA=base, GITHUB_STEP_SUMMARY=str(tmp_path / "summary.md")
+        os.environ,
+        BASE_SHA=base,
+        GITHUB_STEP_SUMMARY=str(tmp_path / "summary.md"),
+        GIT_CONFIG_COUNT="1",
+        GIT_CONFIG_KEY_0="core.quotePath",
+        GIT_CONFIG_VALUE_0="true",
     )
     proc = subprocess.run(
         [BASH, script.as_posix()], cwd=repo, env=env, capture_output=True, text=True
