@@ -62,3 +62,19 @@ INC-060,absence-read-as-success,review,issue,primary,https://github.com/anthropi
 INC-061,absence-read-as-success,review,issue,primary,https://github.com/anthropics/claude-code/issues/59712
 INC-062,absence-read-as-success,review,issue,primary,https://github.com/anthropics/claude-code-action/issues/1361
 INC-063,absence-read-as-success,review,issue,primary,https://github.com/jadedm/claude-review-action/issues/15
+INC-100,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/260
+INC-101,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/372
+INC-102,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1426
+INC-103,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1942
+INC-104,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/84
+INC-105,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/191
+INC-106,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/83
+INC-107,tests-that-cannot-fail,review,pull request,primary,https://github.com/Osasuwu/music-intel-mcp/pull/177
+INC-108,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/227
+INC-109,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/150
+INC-110,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/220
+INC-111,tests-that-cannot-fail,after-merge,issue,private,"private, not verifiable"
+INC-112,tests-that-cannot-fail,after-merge,issue,private,"private, not verifiable"
+INC-113,tests-that-cannot-fail,after-merge,issue,private,"private, not verifiable"
+INC-114,tests-that-cannot-fail,after-merge,issue,private,"private, not verifiable"
+INC-115,tests-that-cannot-fail,ci,issue,private,"private, not verifiable"
