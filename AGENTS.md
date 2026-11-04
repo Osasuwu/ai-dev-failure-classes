@@ -27,6 +27,7 @@ stop, not a bypass.
 | `machinery-guard` | `machinery-guard.yml` | changed paths against the machinery list in that workflow |
 | `ruff` (not required) | `lint.yml` | `ruff check .` over every Python file, on every PR and push to `main`; the version is pinned in `.github/ruff-requirements.txt` |
 | `quote-check` (not required) | `quote-check.yml` | quoted passages in changed `.md` files, via `scripts/check_quotes.py`; fails only on NOT FOUND |
+| `doc-review` (not required) | `doc-review.yml` | advisory; the documents a PR changes, per `.github/hold-paths.json`: one run per PR, one more on request if the text changed; findings never fail it, an errored run does |
 
 Also: `quote-cron.yml` re-checks every doc weekly; `authority-detector.yml` records label
 removals and branch-protection changes; `agent-dispatch.yml` runs a headless worker when an

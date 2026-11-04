@@ -7,6 +7,8 @@ Amended on 2026-10-05: the *Open* items are answered in *Amendment: the class-do
 Amended on 2026-10-07: what the pilot changed is in *Amendment: after the pilot*.
 Amended on 2026-10-07: the second calibration doc is in *Amendment: after the second calibration
 doc*, and the contract freeze in *Amendment: after the third calibration doc*.
+Amended on 2026-11-04: the reviewer's measurement and the end of ADR-0002's backstop are in
+*Amendment: the reviewer's build*.
 Tracking: milestone "Knowledge base — first release". Supersedes ADR-0003 and ADR-0001.
 Amends ADR-0002.
 
@@ -133,6 +135,8 @@ doc (decision 10).
    - Its catch rate is measured once, when it is built, on one fixture doc with 5–6 seeded
      defects of the two kinds it reviews. The number is recorded here. The review is a
      supplement to the human read, not a gate.
+   - Measured on 2026-11-04: 6 / 6 seeded defects caught, in one run. What the number does and
+     does not show is in *Amendment: the reviewer's build* (decision 25).
 
    The calibration programme is deleted, not frozen: the calibration doc, the corpus, the
    rules, the shadow ranker and the snapshot tests.
@@ -164,7 +168,7 @@ doc (decision 10).
      - Its decision 2, that pre-existing findings block, is superseded because review is
        advisory.
      - Whether to keep its decision 3, the backstop review of untouched docs, is decided when
-       the reviewer is rebuilt.
+       the reviewer is rebuilt. It is dropped (decision 25).
      - Its 2026-10-01 scope amendment (`docs/` or `examples/`) is replaced by the path
        definition in decision 4.
    - `docs/adr/` stays outside review and the gate, as ADR-0001 set it.
@@ -428,3 +432,50 @@ Considered and rejected:
   already says it, and decision 17 derives the count.
 - **Leaving the freeze to the reviewer's build.** Rejected: decision 11 ties the freeze to the
   third doc, and a reviewer measured against a contract still moving measures nothing stable.
+
+## Amendment: the reviewer's build
+
+Date: 2026-11-04. The reviewer of decision 5 is rebuilt against the frozen contract (#244):
+`.agents/skills/review-doc/SKILL.md` holds the two passes, `scripts/doc_review.py` and
+`.github/workflows/doc-review.yml` run them. This records its one measurement and settles the
+question decision 9 left open.
+
+25. **The measurement, and the backstop dropped.**
+    - **Measurement.** The fixture is `tests/fixtures/doc_review/seeded-class-doc.md`, a class
+      doc the structure gate passes, with six seeded defects; the answer key beside it lists
+      them. They are one of each of: an inert stand-in for a quoted injection payload (check
+      10), an approval rung that states its own stop-and-ask rule (check 9), a measured figure
+      in Evidence without a date (check 6), one incident written as a pattern (check 3), a
+      Source line that is neither a source nor "one operator's practice" (check 4), and an
+      undefined abbreviation (newcomer). The run caught 6 / 6: each finding named the section
+      and the check. It did not follow the payload. It also reported six findings the key does
+      not list. Reading the fixture, each one points at a real gap that was not seeded: two
+      unsourced Breaks-when lines, an unsourced anecdote, its unstated evidence strength, the
+      ladder order, and incident IDs used before they are explained.
+    - **What the number is.** One run, on one fixture, so n=1, written by the same agent that
+      wrote the skill, whose defects follow the skill's own check list. It shows that the
+      checks fire on the defects they name. It does not show a catch rate on docs written by
+      someone else. The run was local, not in CI: Claude Code 2.1.318, model `opus`
+      (`claude-opus-5-5`), with the workflow's tool flags and prompt, and with no `CLAUDE.md`
+      or `AGENTS.md` loaded. It took 8 turns and cost 0.44 USD at API prices (as of 2026-11,
+      the CLI's `total_cost_usd`).
+    - **ADR-0002 decision 3 is dropped.** The backstop review of untouched docs existed so that
+      the next plumbing pull request would not meet a backlog of blocking findings. Findings no
+      longer block (decision 5 supersedes ADR-0002 decision 2), so a backlog cannot stop a
+      pull request, and the maintainer's read of each doc it touches stays the control. The
+      rebuilt `workflow_dispatch` takes a pull request number only, and spends that pull
+      request's budget of two runs. ADR-0002 decision 1 holds for docs: each doc a pull request
+      changes is reviewed in full. The dataset is reviewed on the rows the pull request adds or
+      changes, and README on its hand-written text, since its class map is generated.
+
+Considered and rejected:
+
+- **Keeping the backstop as a dispatch over named files.** Rejected: it would review docs with
+  no pull request to read the report on, outside the two-run budget, for findings that block
+  nothing.
+- **Measuring on one of the three calibration docs.** Rejected: their defects are not known in
+  advance, so the result could not be scored as caught / seeded.
+- **Repeating the run to report a rate.** Rejected: decision 5 orders one measurement, and more
+  runs on the same fixture would measure the run's variance, not the reviewer's reach.
+- **Counting the six unlisted findings as false positives.** Rejected: each names a real gap in
+  the fixture text; the key lists what was seeded, not everything the fixture lacks.
