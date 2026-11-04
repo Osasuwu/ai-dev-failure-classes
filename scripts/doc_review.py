@@ -43,9 +43,7 @@ NO_DOC = "no document this reviewer reads changed"
 FORK = "not reviewed: fork PR, no secret"
 DRAFT = "draft; the automatic run waits for ready for review"
 NOT_OPEN = "the PR is not open"
-REFUSE_BUDGET = (
-    "one automatic and one requested review already ran on this PR (ADR-0004 decision 5)"
-)
+REFUSE_BUDGET = "one automatic and one requested review already ran on this PR (ADR-0004 decision 5)"
 NOT_PROSE = "not prose; the structure gate checks it"
 NO_ROWS = "no added or changed rows"
 
@@ -188,7 +186,9 @@ def plan_run(event, pr, files, comments, definition):
     d = digest(reviewed)
 
     def make(action, message, run=0):
-        return Plan(action, message, run, head, d, tuple(reviewed), tuple(skipped), rows)
+        return Plan(
+            action, message, run, head, d, tuple(reviewed), tuple(skipped), rows
+        )
 
     if _is_fork(pr):
         return make("fork", FORK)
@@ -226,7 +226,12 @@ def plan_run(event, pr, files, comments, definition):
 
 
 def render_block(plan, kind):
-    record = {"digest": plan.digest, "kind": kind, "run": plan.run, "sha": plan.head_sha}
+    record = {
+        "digest": plan.digest,
+        "kind": kind,
+        "run": plan.run,
+        "sha": plan.head_sha,
+    }
     return f"<!-- {MARKER}: {json.dumps(record, sort_keys=True)} -->"
 
 
@@ -251,7 +256,13 @@ def render_report_comment(plan, report, run_url):
         lines.append("Not reviewed:")
         lines += [f"- `{path}`: {reason}" for path, reason in plan.skipped]
         lines.append("")
-    lines += ["</details>", "", f"[Run log]({run_url})", "", render_block(plan, "report")]
+    lines += [
+        "</details>",
+        "",
+        f"[Run log]({run_url})",
+        "",
+        render_block(plan, "report"),
+    ]
     return "\n".join(lines)
 
 
@@ -397,13 +408,19 @@ def _status(repo, plan, state, url):
 
 def main(argv):
     command = argv[0]
-    repo, number, url = os.environ["REPO"], os.environ["PR_NUMBER"], os.environ["RUN_URL"]
+    repo, number, url = (
+        os.environ["REPO"],
+        os.environ["PR_NUMBER"],
+        os.environ["RUN_URL"],
+    )
 
     if command == "classify":
         pr = _api("GET", f"/repos/{repo}/pulls/{number}")
         files = _pages(f"/repos/{repo}/pulls/{number}/files")
         comments = _pages(f"/repos/{repo}/issues/{number}/comments")
-        plan = plan_run(os.environ["EVENT_NAME"], pr, files, comments, load_definition(Path.cwd()))
+        plan = plan_run(
+            os.environ["EVENT_NAME"], pr, files, comments, load_definition(Path.cwd())
+        )
         state, work = _dirs()
         state.mkdir(parents=True, exist_ok=True)
         work.mkdir(parents=True, exist_ok=True)

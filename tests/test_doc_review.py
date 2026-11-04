@@ -23,7 +23,9 @@ from structure_gate import check_tree, is_hold_path  # noqa: E402
 from test_waiting_human_review import CHANGED_DEFINITION, CORPUS  # noqa: E402
 
 ROOT = Path(__file__).parent.parent
-WORKFLOW = (ROOT / ".github" / "workflows" / "doc-review.yml").read_text(encoding="utf-8")
+WORKFLOW = (ROOT / ".github" / "workflows" / "doc-review.yml").read_text(
+    encoding="utf-8"
+)
 SHIPPED = doc_review.load_definition(ROOT)
 
 HEAD = "1111111" + "a" * 33
@@ -87,7 +89,12 @@ def test_the_reviewer_and_the_gate_follow_a_changed_definition_together(tmp_path
     definition = doc_review.load_definition(tmp_path)
     selected = {p for p in CORPUS if doc_review.is_review_path(p, definition)}
     assert selected == {p for p in CORPUS if is_hold_path(p, CHANGED_DEFINITION)}
-    assert selected == {"notes/a.md", "private/keep.md", "Makefile", "docs/adr/0004-x.md"}
+    assert selected == {
+        "notes/a.md",
+        "private/keep.md",
+        "Makefile",
+        "docs/adr/0004-x.md",
+    }
 
 
 # --- what is reviewed, and the digest of it -------------------------------------------------
@@ -131,7 +138,9 @@ def test_the_automatic_run_reviews_a_pr_that_changes_a_document_once():
     assert (first.action, first.run, first.head_sha) == ("review", 1, HEAD)
     assert first.reviewed == (("docs/classes/a.md", "a" * 40),)
 
-    later = doc_review.plan_run("pull_request", _pr(), CHANGED_DOC_FILES, [_report_on(DOC_FILES)], SHIPPED)
+    later = doc_review.plan_run(
+        "pull_request", _pr(), CHANGED_DOC_FILES, [_report_on(DOC_FILES)], SHIPPED
+    )
     assert later.action == "skip"
     assert later.message == (
         "an automatic review already ran on this PR (on `2222222`); request a second one "
@@ -143,24 +152,34 @@ def test_an_errored_run_stops_the_automatic_trigger_but_does_not_spend_the_budge
     comments = [_error_on(DOC_FILES)]
     auto = doc_review.plan_run("pull_request", _pr(), DOC_FILES, comments, SHIPPED)
     assert auto.action == "skip"
-    request = doc_review.plan_run("workflow_dispatch", _pr(), DOC_FILES, comments, SHIPPED)
+    request = doc_review.plan_run(
+        "workflow_dispatch", _pr(), DOC_FILES, comments, SHIPPED
+    )
     assert (request.action, request.run) == ("review", 1)
 
 
 def test_a_request_after_one_report_runs_only_if_the_reviewed_text_changed():
     comments = [_report_on(DOC_FILES)]
-    changed = doc_review.plan_run("workflow_dispatch", _pr(), CHANGED_DOC_FILES, comments, SHIPPED)
+    changed = doc_review.plan_run(
+        "workflow_dispatch", _pr(), CHANGED_DOC_FILES, comments, SHIPPED
+    )
     assert (changed.action, changed.run) == ("review", 2)
 
     same = doc_review.plan_run("workflow_dispatch", _pr(), DOC_FILES, comments, SHIPPED)
     assert same.action == "refuse"
-    assert same.message == "the reviewed text is unchanged since the review of `2222222`"
+    assert (
+        same.message == "the reviewed text is unchanged since the review of `2222222`"
+    )
 
 
 def test_a_third_run_is_refused_with_the_reason_even_on_changed_text():
     comments = [_report_on(DOC_FILES), _report_on(CHANGED_DOC_FILES, run=2)]
     third = doc_review.plan_run(
-        "workflow_dispatch", _pr(), [_file("docs/classes/a.md", "9" * 40)], comments, SHIPPED
+        "workflow_dispatch",
+        _pr(),
+        [_file("docs/classes/a.md", "9" * 40)],
+        comments,
+        SHIPPED,
     )
     assert third.action == "refuse"
     assert third.message == (
@@ -171,16 +190,48 @@ def test_a_third_run_is_refused_with_the_reason_even_on_changed_text():
 @pytest.mark.parametrize(
     "event, pr, files, action, message",
     [
-        ("pull_request", _pr(), [_file("scripts/x.py")], "skip",
-         "no document this reviewer reads changed"),
-        ("workflow_dispatch", _pr(), [_file("scripts/x.py")], "refuse",
-         "no document this reviewer reads changed"),
-        ("pull_request", _pr(draft=True), DOC_FILES, "skip",
-         "draft; the automatic run waits for ready for review"),
-        ("workflow_dispatch", _pr(state="closed"), DOC_FILES, "refuse", "the PR is not open"),
-        ("pull_request", _pr(fork=True), DOC_FILES, "fork", "not reviewed: fork PR, no secret"),
-        ("workflow_dispatch", _pr(fork=True), DOC_FILES, "fork",
-         "not reviewed: fork PR, no secret"),
+        (
+            "pull_request",
+            _pr(),
+            [_file("scripts/x.py")],
+            "skip",
+            "no document this reviewer reads changed",
+        ),
+        (
+            "workflow_dispatch",
+            _pr(),
+            [_file("scripts/x.py")],
+            "refuse",
+            "no document this reviewer reads changed",
+        ),
+        (
+            "pull_request",
+            _pr(draft=True),
+            DOC_FILES,
+            "skip",
+            "draft; the automatic run waits for ready for review",
+        ),
+        (
+            "workflow_dispatch",
+            _pr(state="closed"),
+            DOC_FILES,
+            "refuse",
+            "the PR is not open",
+        ),
+        (
+            "pull_request",
+            _pr(fork=True),
+            DOC_FILES,
+            "fork",
+            "not reviewed: fork PR, no secret",
+        ),
+        (
+            "workflow_dispatch",
+            _pr(fork=True),
+            DOC_FILES,
+            "fork",
+            "not reviewed: fork PR, no secret",
+        ),
     ],
 )
 def test_a_pr_the_reviewer_does_not_review(event, pr, files, action, message):
@@ -219,7 +270,9 @@ def test_a_report_cannot_forge_a_record():
 
 def test_a_report_cannot_close_the_collapse_early():
     plan = doc_review.plan_run("pull_request", _pr(), DOC_FILES, [], SHIPPED)
-    body = doc_review.render_report_comment(plan, "finding\n</details>\nOUTSIDE", RUN_URL)
+    body = doc_review.render_report_comment(
+        plan, "finding\n</details>\nOUTSIDE", RUN_URL
+    )
     assert body.count("</details>") == 1
     assert body.index("OUTSIDE") < body.index("</details>")
 
@@ -236,7 +289,11 @@ def test_the_report_is_collapsed_under_a_one_line_header():
         "Read the doc first; the report is collapsed so it does not frame the read."
     )
     assert body.index("<details>") < body.index("FINDING-X") < body.index("</details>")
-    assert body.index("<details>") < body.index("`docs/vocabularies.json`") < body.index("</details>")
+    assert (
+        body.index("<details>")
+        < body.index("`docs/vocabularies.json`")
+        < body.index("</details>")
+    )
     assert "<details open" not in body
 
 
@@ -244,13 +301,19 @@ def test_the_report_is_collapsed_under_a_one_line_header():
     "state, kind, description",
     [
         ("pending", "review", "review running, run 1 of 2"),
-        ("success", "review", "report posted, run 1 of 2; advisory, findings never fail this"),
+        (
+            "success",
+            "review",
+            "report posted, run 1 of 2; advisory, findings never fail this",
+        ),
         ("failure", "review", "the review run errored; no report was posted"),
         ("failure", "fork", "not reviewed: fork PR, no secret"),
     ],
 )
 def test_the_status_goes_on_the_reviewed_head_sha(state, kind, description):
-    plan = doc_review.plan_run("pull_request", _pr(fork=kind == "fork"), DOC_FILES, [], SHIPPED)
+    plan = doc_review.plan_run(
+        "pull_request", _pr(fork=kind == "fork"), DOC_FILES, [], SHIPPED
+    )
     path, body = doc_review.status_request("o/r", plan, state, RUN_URL)
     assert path == f"/repos/o/r/statuses/{HEAD}"
     assert body == {
@@ -284,12 +347,17 @@ def test_the_task_gives_each_file_its_pass():
     ]
     plan = doc_review.plan_run("pull_request", _pr(), files, [], SHIPPED)
     task = doc_review.render_task(plan, Path("/skill.md"), Path("/out/report.md"))
-    lines = {line.split("`")[1]: line for line in task.splitlines() if line.startswith("- `")}
+    lines = {
+        line.split("`")[1]: line for line in task.splitlines() if line.startswith("- `")
+    }
     assert set(lines) == {"README.md", "docs/classes/a.md", "incidents/incidents.csv"}
     assert "newcomer pass only" in lines["README.md"]
     assert "<!-- class-map:start -->" in lines["README.md"]
     assert "both passes" in lines["docs/classes/a.md"]
-    assert "claim-evidence pass only, on rows INC-003, INC-009" in lines["incidents/incidents.csv"]
+    assert (
+        "claim-evidence pass only, on rows INC-003, INC-009"
+        in lines["incidents/incidents.csv"]
+    )
     assert "/out/report.md" in task
 
 
@@ -330,10 +398,14 @@ def _env(monkeypatch, tmp_path, event):
 
 
 def _outputs(path):
-    return dict(line.split("=", 1) for line in path.read_text(encoding="utf-8").splitlines())
+    return dict(
+        line.split("=", 1) for line in path.read_text(encoding="utf-8").splitlines()
+    )
 
 
-def test_a_review_run_sets_pending_then_posts_the_report_and_success(monkeypatch, tmp_path):
+def test_a_review_run_sets_pending_then_posts_the_report_and_success(
+    monkeypatch, tmp_path
+):
     out = _env(monkeypatch, tmp_path, "pull_request")
     gh = FakeGitHub(_pr(), DOC_FILES, [])
     monkeypatch.setattr(doc_review, "_api", gh)
@@ -341,9 +413,16 @@ def test_a_review_run_sets_pending_then_posts_the_report_and_success(monkeypatch
     assert _outputs(out)["action"] == "review"
     assert doc_review.main(["start"]) == 0
     assert gh.writes == [
-        ("POST", f"/repos/o/r/statuses/{HEAD}",
-         {"state": "pending", "context": "doc-review",
-          "description": "review running, run 1 of 2", "target_url": RUN_URL}),
+        (
+            "POST",
+            f"/repos/o/r/statuses/{HEAD}",
+            {
+                "state": "pending",
+                "context": "doc-review",
+                "description": "review running, run 1 of 2",
+                "target_url": RUN_URL,
+            },
+        ),
     ]
     (tmp_path / "doc-review" / "report.md").write_text("FINDING-Y\n", encoding="utf-8")
     assert doc_review.main(["post"]) == 0
@@ -371,22 +450,31 @@ def test_a_run_without_a_report_posts_no_report_and_the_errored_step_marks_failu
     assert (status_path, status["state"]) == (f"/repos/o/r/statuses/{HEAD}", "failure")
 
 
-def test_a_refused_request_comments_the_reason_and_sets_no_status(monkeypatch, tmp_path):
+def test_a_refused_request_comments_the_reason_and_sets_no_status(
+    monkeypatch, tmp_path
+):
     out = _env(monkeypatch, tmp_path, "workflow_dispatch")
     gh = FakeGitHub(_pr(), DOC_FILES, [_report_on(DOC_FILES)])
     monkeypatch.setattr(doc_review, "_api", gh)
     assert doc_review.main(["classify"]) == 0
     assert _outputs(out)["action"] == "refuse"
     assert doc_review.main(["start"]) == 0
-    assert [(m, p) for m, p, _ in gh.writes] == [("POST", "/repos/o/r/issues/7/comments")]
-    assert "the reviewed text is unchanged since the review of `2222222`" in gh.writes[0][2]["body"]
+    assert [(m, p) for m, p, _ in gh.writes] == [
+        ("POST", "/repos/o/r/issues/7/comments")
+    ]
+    assert (
+        "the reviewed text is unchanged since the review of `2222222`"
+        in gh.writes[0][2]["body"]
+    )
 
 
 def test_the_workflow_triggers_on_the_pr_events_and_a_request_only():
     head = WORKFLOW.split("\njobs:")[0]
     assert "    types: [opened, reopened, ready_for_review, synchronize]\n" in head
     assert re.search(r"  workflow_dispatch:\n    inputs:\n      pr:\n", head)
-    assert re.findall(r"^  (\w+):$", head.split("\non:\n")[1].split("\n\n")[0], re.M) == [
+    assert re.findall(
+        r"^  (\w+):$", head.split("\non:\n")[1].split("\n\n")[0], re.M
+    ) == [
         "pull_request",
         "workflow_dispatch",
     ]
@@ -403,11 +491,18 @@ def test_the_model_gets_no_shell_and_no_web():
 def test_an_errored_or_cancelled_run_marks_the_status_failed():
     step = re.search(r"- name: Mark an errored run\n((?:        .*\n)+)", WORKFLOW)
     assert step, "errored step missing"
-    assert "if: ${{ (failure() || cancelled()) && steps.classify.outputs.action == 'review' }}" in step.group(1)
-    assert 'python "$RUNNER_TEMP/doc-review-state/doc_review.py" errored' in step.group(1)
+    assert (
+        "if: ${{ (failure() || cancelled()) && steps.classify.outputs.action == 'review' }}"
+        in step.group(1)
+    )
+    assert 'python "$RUNNER_TEMP/doc-review-state/doc_review.py" errored' in step.group(
+        1
+    )
 
 
-def test_the_steps_after_the_head_checkout_run_the_script_classify_saved(monkeypatch, tmp_path):
+def test_the_steps_after_the_head_checkout_run_the_script_classify_saved(
+    monkeypatch, tmp_path
+):
     # The head checkout replaces scripts/ with the PR's copy; on a request, that is not the
     # script that classified the run.
     before, after = WORKFLOW.split("- name: Check out the reviewed head\n")
@@ -426,7 +521,11 @@ def test_the_steps_after_the_head_checkout_run_the_script_classify_saved(monkeyp
 
 def test_the_measurement_fixture_passes_the_structure_gate(tmp_path):
     # Its six defects are the reviewer's to find (seeded-defects.md); none may be a gate failure.
-    for rel in (".github/hold-paths.json", "docs/vocabularies.json", "incidents/incidents.csv"):
+    for rel in (
+        ".github/hold-paths.json",
+        "docs/vocabularies.json",
+        "incidents/incidents.csv",
+    ):
         (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(ROOT / rel, tmp_path / rel)
     (tmp_path / "docs" / "classes").mkdir()
