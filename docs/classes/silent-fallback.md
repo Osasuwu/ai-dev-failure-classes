@@ -28,9 +28,9 @@ Nothing looks wrong. The logs show no error, the job ends with success, the serv
 
 ## Mechanism
 
-**The failure signal is turned into a valid value.** At the failing line the code knows something went wrong; a handler converts that into a value of the normal type, with no bit that says it is a stand-in. An empty list reads as no results (INC-201); a local count reads as a counted like (INC-205), `None` from a factory reads as nothing to check (INC-211, private), a returned "no collision" from an uncalibrated check reads as clear (INC-212, private). INC-202 is the same hole, found by an audit before it fired: had the embedding model been switched to one with larger vectors, the vector search would have failed on the size mismatch, and its handler would have returned an empty list for every query. Each layer can be reasonable on its own; stacked, they launder an infrastructure failure into a success the caller reports.
+**The failure signal is turned into a valid value.** At the failing line the code knows something went wrong; a handler converts that into a value of the normal type, with no bit that says it is a stand-in. An empty list reads as no results (INC-201); a local count reads as a counted like (INC-205), `None` from a factory reads as nothing to check (INC-211, private), a returned "no collision" from a check whose sensor had not been calibrated reads as clear (INC-212, private). INC-202 is the same hole, found by an audit before it fired: had the embedding model been switched to one with larger vectors, the vector search would have failed on the size mismatch, and its handler would have returned an empty list for every query. Each layer can be reasonable on its own; stacked, they launder an infrastructure failure into a success the caller reports.
 
-**A missing input is treated as a feature switched off.** A missing id or an uncalibrated sensor is handled as a feature that is off rather than as a fault (INC-205; INC-212, private). Nothing in the code marks the empty case as a fault; it runs down the same path as the off case, and the fallback it lands on looks like normal output.
+**A missing input is treated as a feature switched off.** A missing id or a sensor that had not been calibrated is handled as a feature that is off rather than as a fault (INC-205; INC-212, private). Nothing in the code marks the empty case as a fault; it runs down the same path as the off case, and the fallback it lands on looks like normal output.
 
 **A status is dropped or replaced by a default.** A step's result is not read, so the run reports success over failed parts (INC-210, private). A default or a simpler method stands in for one that failed: a flat target instead of an error from a loader (INC-213, private), a simpler solver whenever the full one returns nothing (INC-209, private). Rust marks `Result` as must-use because "ignoring an error value can hide a failed operation" ([Rust `must_use`](https://doc.rust-lang.org/std/attribute.must_use.html)).
 
@@ -40,7 +40,7 @@ Nothing looks wrong. The logs show no error, the job ends with success, the serv
 
 **Agents add the fallback.** A study of automated issue solving names "evasive repair": the tool treats a symptom with defensive code such as a broad try-except or a null check, and "This prevents crashes but masks root causes." ([Liu et al.](https://arxiv.org/html/2509.13941)). A practitioner rule set for LLM-written Python says "Many models overuse broad try and except blocks, and one of the most problematic variants is catching every exception and ignoring it entirely." ([Dagster](https://dagster.io/blog/dignified-python-10-rules-to-improve-your-llm-agents)). Anthropic's prompting guide notes that some Claude models overengineer and suggests a sample prompt: "Don't add error handling, fallbacks, or validation for scenarios that can't happen." ([Claude prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)). Two public reports show the rule in an instruction file not holding: the agent added fallbacks the file forbade (INC-214), and after a plan built under a fail-fast, no-fallback policy it reported an automatic fallback chain as a feature (INC-215).
 
-**Fixes move the failure.** Making one site loud often leaves its sibling quiet, and making it fail closed can block legitimate work. In the maintainer's record (the incidents from the maintainer's own repositories, and one operator's audit of 12 of them; see Evidence), fixes that made a site report its failure moved the failure elsewhere in all three cases, and per-site fail-closed fixes with a pinning test held at their site but left a sibling site open in all six cases (as of 2026-10, one operator's audit, private, not verifiable). One soft-fail was right by design for a transient failure and wrong for a permanent one: a like must not fail because a spreadsheet was slow, but the same catch also swallowed an error that meant the counter could never work (INC-206).
+**Fixes move the failure.** In the maintainer's record (the incidents from the maintainer's own repositories, and the maintainer's audit of 12 of them, cited below as "one operator's audit"; see Evidence), fixes that made a site report its failure moved the failure elsewhere in all three cases, and per-site fail-closed fixes, each with a test that pins the fixed behaviour, held at their site but left a sibling site open in all six cases (as of 2026-10, one operator's audit, private, not verifiable). In one case a fail-closed check blocked legitimate work (as of 2026-10, one operator's audit, private, not verifiable; see the Choke point rung). One soft-fail was right by design for a transient failure and wrong for a permanent one: a like must not fail because a spreadsheet was slow, but the same catch also swallowed an error that meant the counter could never work (INC-206).
 
 ## Where it surfaces
 
@@ -48,13 +48,13 @@ More than half the rows were found after merge: in 9 of this class's 16 dataset 
 
 ## Protections
 
-Ordered from the cheapest rung to the strongest. The rungs that act on the code catch a fallback before it ships; the checks that run outside it catch the ones that shipped anyway, and are the ones that can see a process that stopped. No rung replaces another.
+Ordered from the cheapest rung to the strongest. The rungs that act on the code catch a fallback before it ships; the checks that run outside it catch the ones that shipped anyway, and are the ones that can see a process that stopped. No rung replaces another. A Source line that reads "one operator's practice" means the maintainer's practice, with no outside source behind it.
 
 ### Prompt: tell the agent to fail loudly and add no fallback
 
 - **Source:** the Python norm "Errors should never pass silently." ([PEP 20](https://peps.python.org/pep-0020/)); projects write it into their agent instruction files, for example "Fail loudly, and never fall back to a silently wrong result." ([lanl/PyBNF#835](https://github.com/lanl/PyBNF/pull/835)); Anthropic's guide suggests a sample prompt telling Claude not to add fallbacks for cases that cannot happen ([Claude prompting best practices](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices)).
 - **Cost:** tokens.
-- **Breaks when:** the agent is fixing a crash, where a catch is the shortest path to green; and the rule did not hold in either public report (INC-214, INC-215), where it was in the project's instruction file. An audit of one project whose instruction file bans silent fallbacks counted 40 such sites in its code ([amd/gaia#2316](https://github.com/amd/gaia/issues/2316)); it does not say who wrote them. PEP 20's next line, "Unless explicitly silenced.", can be read as licensing the `return []` handler. In the maintainer's record, fixes written as prose recurred (as of 2026-10, one operator's audit, private, not verifiable).
+- **Breaks when:** the agent is fixing a crash, where a catch is the shortest path to green; and the rule did not hold in either public report (INC-214, INC-215), where it was in the project's instruction file. An audit of one project whose instruction file bans silent fallbacks counted 40 such sites in its code ([amd/gaia#2316](https://github.com/amd/gaia/issues/2316)); it does not say who wrote them. PEP 20's next line, "Unless explicitly silenced.", can be read as licensing the `return []` handler. In the maintainer's record, fixes written only as instructions (a rule in a prompt or a doc) were followed by the same failure again (as of 2026-10, one operator's audit, private, not verifiable).
 
 ### Lint: flag swallowed errors in the changed lines
 
@@ -84,13 +84,13 @@ Ordered from the cheapest rung to the strongest. The rungs that act on the code 
 
 - **Source:** Prometheus `absent()` is for alerting when no time series exists ([Prometheus functions](https://prometheus.io/docs/prometheus/latest/querying/functions/)); in Grafana, "The No Data state occurs when the alert rule query runs successfully but returns no data points at all." ([Grafana](https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rule-evaluation/nodata-and-error-states/)).
 - **Cost:** one rule per series that should keep arriving.
-- **Breaks when:** the job keeps emitting its success metric while its output is empty, or the no-data state is set to normal to quiet noise. It catches a stop, not a wrong result.
+- **Breaks when:** the job keeps emitting its success metric while its output is empty, since `absent()` "returns an empty vector if the vector passed to it has any elements" ([Prometheus functions](https://prometheus.io/docs/prometheus/latest/querying/functions/)); or the no-data state is set to keep its last state, an option Grafana offers to "minimize the number of No Data or Error state alerts received" ([Grafana](https://grafana.com/docs/grafana/latest/alerting/fundamentals/alert-rule-evaluation/nodata-and-error-states/)). It catches a stop, not a wrong result.
 
 ### Watch the watcher
 
 - **Source:** an always-firing Watchdog alert that an external receiver expects, so a dead alerting pipeline is itself noticed ([Prometheus Operator runbook](https://runbooks.prometheus-operator.dev/runbooks/general/watchdog/)). A monitor that runs as a scheduled workflow can be switched off by the platform itself; [absence read as success](absence-read-as-success.md) has the GitHub case.
 - **Cost:** one alert rule and an external receiver.
-- **Breaks when:** the receiver shares a failure with the thing it watches, or nobody is paged when the watchdog goes quiet.
+- **Breaks when:** the receiver shares a failure with the thing it watches, or nobody is paged when the watchdog goes quiet; the runbook relies on that silence to "alert external systems that this alerting system is no longer working" ([Prometheus Operator runbook](https://runbooks.prometheus-operator.dev/runbooks/general/watchdog/)).
 
 ### Errors: send them where a person reads them, and count them
 
@@ -108,7 +108,7 @@ Ordered from the cheapest rung to the strongest. The rungs that act on the code 
 
 - **Source:** "To begin with, fallback logic is hard to test." and "If fallback is essential in a system, we exercise it as often as possible in production"; for retries, "we maintain metrics that monitor overall retry rates and alarms that alert our teams if retries are happening frequently." ([AWS, avoiding fallback](https://aws.amazon.com/builders-library/avoiding-fallback-in-distributed-systems/)). Where degrading is the right call, returning a typed "unavailable" result instead of a normal-looking value is one operator's practice.
 - **Cost:** engineering time; metrics and an alarm per fallback.
-- **Breaks when:** a fallback emits no metric, so how often it fires is unknown; or the caller converts the typed result back into a default.
+- **Breaks when:** a fallback emits no metric, so how often it fires is unknown, as INC-201's telemetry fired only on success; or the caller turns a stand-in back into a default, as INC-211's caller read a factory's `None` as no checks to run (private).
 
 ### Content: probe the output from outside and check it is right
 
@@ -126,7 +126,7 @@ Ordered from the cheapest rung to the strongest. The rungs that act on the code 
 
 - **Source:** in gray failure, "the system's failure detectors may not notice problems even when applications are afflicted by them"; the paper's answer is differential observability, "bridging the gap between different components' perceptions of what constitutes failure" ([Huang et al., HotOS 2017](https://www.microsoft.com/en-us/research/publication/gray-failure-achilles-heel-cloud-scale-systems/)). For a physical safety limit, enforcing it below the software that could fall back is one operator's practice.
 - **Cost:** a second implementation, a separate service or hardware.
-- **Breaks when:** the checker shares a dependency, a configuration or an input with the producer, or it also accepts the fallback output as valid.
+- **Breaks when:** the checker shares a dependency, a configuration or an input with the producer, as the watchdog step inside INC-203's daemon died with the daemon; or it also accepts the fallback output as valid, as INC-201's "Found N memories" counted keyword-only results as a successful search.
 
 ## Evidence
 
