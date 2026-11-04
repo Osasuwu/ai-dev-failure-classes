@@ -16,7 +16,8 @@ def test_every_action_in_every_workflow_is_pinned_to_a_full_commit_sha():
     assert files, f"no workflows found in {WORKFLOWS}"
     unpinned = []
     for path in files:
-        for ref in re.findall(r"uses:\s*(\S+)", path.read_text(encoding="utf-8")):
+        # `\b`: the key `statuses:` ends in `uses:` and is not an action reference.
+        for ref in re.findall(r"\buses:\s*(\S+)", path.read_text(encoding="utf-8")):
             # An action in this repo (`./path`) has no ref: it runs at the workflow's own commit.
             if ref.startswith("./"):
                 continue
