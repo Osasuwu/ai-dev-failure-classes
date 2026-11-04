@@ -105,9 +105,7 @@ _GRAPHQL_RE = re.compile(r"\b(" + "|".join(GRAPHQL_MUTATIONS) + r")\b")
 
 def _names_hold_label(values: list[str]) -> bool:
     return any(
-        part.strip().lower() == HOLD_LABEL
-        for v in values
-        for part in v.split(",")
+        part.strip().lower() == HOLD_LABEL for v in values for part in v.split(",")
     )
 
 
@@ -151,7 +149,11 @@ def check_api(args: list[str]) -> str | None:
         if flag_values(args, "--input"):
             return "gh api --input to an issue: pass the fields inline so a labels list can be checked"
         fields = flag_values(args, "-f", "-F", "--field", "--raw-field")
-        labels = [v for k, _, v in (f.partition("=") for f in fields) if re.match(r"labels(\[|$)", k)]
+        labels = [
+            v
+            for k, _, v in (f.partition("=") for f in fields)
+            if re.match(r"labels(\[|$)", k)
+        ]
         if labels and not _names_hold_label(labels):
             return _LABEL_SET_REASON
     return check_rest(api_method(args), text)
@@ -169,7 +171,9 @@ def check_rest(method: str, text: str) -> str | None:
     if method in ("PATCH", "DELETE") and re.search(
         rf"/labels/{re.escape(HOLD_LABEL)}\b", text, re.I
     ):
-        return f"{method} on the {HOLD_LABEL} label itself: the hold label is the human's"
+        return (
+            f"{method} on the {HOLD_LABEL} label itself: the hold label is the human's"
+        )
     return None
 
 
@@ -190,7 +194,11 @@ def check_raw_http(command: str) -> str | None:
     if _GRAPHQL_RE.search(command):
         return "GraphQL mutation over raw HTTP: merges, label removal and protection are the human's"
     m = _HTTP_METHOD_RE.search(command)
-    method = m.group(1).upper() if m else ("POST" if re.search(r"\s(-d|--data)", command) else "GET")
+    method = (
+        m.group(1).upper()
+        if m
+        else ("POST" if re.search(r"\s(-d|--data)", command) else "GET")
+    )
     if (
         method != "GET"
         and _ISSUE_RE.search(command)
@@ -246,16 +254,24 @@ def check_mcp(tool_name: str, tool_input: dict) -> str | None:
 
     mentions_hold = any(s.strip().lower() == HOLD_LABEL for s in _strings(tool_input))
     method = str(tool_input.get("method", "")).lower()
-    if "label" in name and mentions_hold and (
-        method in ("delete", "update") or "remove" in name or "delete" in name
+    if (
+        "label" in name
+        and mentions_hold
+        and (method in ("delete", "update") or "remove" in name or "delete" in name)
     ):
         return f"{tool_name} on {HOLD_LABEL}: only the human releases the hold"
 
     # A `labels` list replaces the whole set. Without the hold label in it,
     # an update can silently drop the hold. Creating a new item cannot.
     labels = tool_input.get("labels")
-    if isinstance(labels, list) and method != "create" and not name.startswith(("create_", "add_")):
-        if not any(isinstance(lbl, str) and lbl.strip().lower() == HOLD_LABEL for lbl in labels):
+    if (
+        isinstance(labels, list)
+        and method != "create"
+        and not name.startswith(("create_", "add_"))
+    ):
+        if not any(
+            isinstance(lbl, str) and lbl.strip().lower() == HOLD_LABEL for lbl in labels
+        ):
             return (
                 f"{tool_name} replaces the label set without {HOLD_LABEL}, which can drop "
                 "the hold; add labels with `gh issue edit --add-label` instead"

@@ -31,7 +31,10 @@ def _run(tool_name: str, tool_input: dict) -> subprocess.CompletedProcess:
 
 def _blocked(result: subprocess.CompletedProcess) -> bool:
     if result.returncode == 2:
-        assert json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"] == "deny"
+        assert (
+            json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"]
+            == "deny"
+        )
         return True
     assert result.returncode == 0, result.stderr
     return False
@@ -68,7 +71,7 @@ BLOCKED_SHELL = [
     'bash -lc "gh pr edit 5 --remove-label waiting-human-review"',
     "zsh -c 'gh pr merge \"$1\"' _ 5",
     "bash -c '$1' _ 'gh pr merge 5'",
-    'bash -c "bash -c \'gh pr merge 5\'"',
+    "bash -c \"bash -c 'gh pr merge 5'\"",
     'pwsh -c "gh pr merge 5"',
     'powershell -Command "gh pr merge 5"',
     "pwsh -CommandWithArgs 'gh pr merge 5'",
@@ -104,7 +107,7 @@ BLOCKED_SHELL = [
     "gh api -X PATCH repos/o/r/labels/waiting-human-review -f new_name=x",
     "gh api graphql -f query='mutation { mergePullRequest(input: {pullRequestId: \"X\"}) { clientMutationId } }'",
     "gh api graphql -f query='mutation { enablePullRequestAutoMerge(input: {pullRequestId: \"X\"}) { clientMutationId } }'",
-    "gh api graphql -f query='mutation { removeLabelsFromLabelable(input: {labelableId: \"X\", labelIds: [\"L\"]}) { clientMutationId } }'",
+    'gh api graphql -f query=\'mutation { removeLabelsFromLabelable(input: {labelableId: "X", labelIds: ["L"]}) { clientMutationId } }\'',
     "gh api graphql -f query='mutation { updateBranchProtectionRule(input: {branchProtectionRuleId: \"X\"}) { clientMutationId } }'",
     "gh api graphql --input q.json",
     "curl -X PUT -H 'Authorization: token x' https://api.github.com/repos/o/r/pulls/12/merge",
@@ -116,7 +119,7 @@ BLOCKED_SHELL = [
     "gh api --method PATCH repos/o/r/issues/5 -F 'labels[]=bug'",
     "gh api -X PATCH repos/o/r/issues/5 -f labels[]=x -f body=waiting-human-review",
     "gh api -X PATCH repos/o/r/issues/5 --input body.json",
-    "curl -X PATCH https://api.github.com/repos/o/r/issues/5 -d '{\"labels\":[\"x\"]}'",
+    'curl -X PATCH https://api.github.com/repos/o/r/issues/5 -d \'{"labels":["x"]}\'',
     # #285: a heredoc fed to a shell or ssh is its standard input, so raw HTTP in the body runs.
     "bash <<'EOF'\ncurl -X PUT https://api.github.com/repos/o/r/pulls/12/merge\nEOF",
     "ssh host <<EOF\ncurl -X DELETE https://api.github.com/repos/o/r/branches/main/protection\nEOF",
@@ -144,11 +147,11 @@ ALLOWED_SHELL = [
     "gh api repos/o/r/issues/12/labels -f 'labels[]=bug'",
     "gh api -X PATCH repos/o/r/issues/5 -f labels[]=waiting-human-review -f labels[]=x",
     "gh api -X PATCH repos/o/r/issues/5 -f state=closed",
-    "curl -X PATCH https://api.github.com/repos/o/r/issues/5 -d '{\"labels\":[\"x\",\"waiting-human-review\"]}'",
-    "curl -X PATCH https://api.github.com/repos/o/r/issues/5 -d '{\"state\":\"closed\"}'",
-    "curl -X POST https://api.github.com/repos/o/r/issues/5/labels -d '{\"labels\":[\"x\"]}'",
+    'curl -X PATCH https://api.github.com/repos/o/r/issues/5 -d \'{"labels":["x","waiting-human-review"]}\'',
+    'curl -X PATCH https://api.github.com/repos/o/r/issues/5 -d \'{"state":"closed"}\'',
+    'curl -X POST https://api.github.com/repos/o/r/issues/5/labels -d \'{"labels":["x"]}\'',
     "curl https://api.github.com/repos/o/r/issues/5 | jq .labels",
-    "gh api graphql -f query='query { repository(owner: \"o\", name: \"r\") { pullRequest(number: 1) { mergeable } } }'",
+    'gh api graphql -f query=\'query { repository(owner: "o", name: "r") { pullRequest(number: 1) { mergeable } } }\'',
     "curl https://api.github.com/repos/o/r/branches/main/protection",
     "git merge origin/main",
     "git log --grep 'gh pr merge'",
@@ -181,37 +184,127 @@ def test_unbalanced_quotes_do_not_hide_a_call():
 def test_raw_http_inside_an_encoded_command_is_checked():
     # Only the decoded text shows the URL, so the nested command texts are scanned too.
     curl = "curl -X PUT https://api.github.com/repos/o/r/pulls/12/merge"
-    assert _shell("pwsh -EncodedCommand " + base64.b64encode(curl.encode("utf-16-le")).decode())
+    assert _shell(
+        "pwsh -EncodedCommand " + base64.b64encode(curl.encode("utf-16-le")).decode()
+    )
 
 
 # --- GitHub MCP -----------------------------------------------------------
 
 BLOCKED_MCP = [
-    ("merge_pull_request", {"owner": "o", "repo": "r", "pullNumber": 12, "merge_method": "squash"}),
+    (
+        "merge_pull_request",
+        {"owner": "o", "repo": "r", "pullNumber": 12, "merge_method": "squash"},
+    ),
     ("enable_pull_request_auto_merge", {"owner": "o", "repo": "r", "pullNumber": 12}),
     ("some_future_merge_tool", {"owner": "o", "repo": "r"}),
     ("update_branch_protection", {"owner": "o", "repo": "r", "branch": "main"}),
     ("create_repository_ruleset", {"owner": "o", "repo": "r"}),
-    ("issue_write", {"method": "update", "owner": "o", "repo": "r", "issue_number": 12, "labels": ["bug"]}),
-    ("issue_write", {"method": "update", "owner": "o", "repo": "r", "issue_number": 12, "labels": []}),
-    ("update_pull_request", {"owner": "o", "repo": "r", "pullNumber": 12, "labels": ["bug"]}),
-    ("label_write", {"method": "delete", "owner": "o", "repo": "r", "name": "waiting-human-review"}),
-    ("label_write", {"method": "update", "owner": "o", "repo": "r", "name": "waiting-human-review", "new_name": "x"}),
-    ("remove_issue_label", {"owner": "o", "repo": "r", "issue_number": 12, "label": "waiting-human-review"}),
+    (
+        "issue_write",
+        {
+            "method": "update",
+            "owner": "o",
+            "repo": "r",
+            "issue_number": 12,
+            "labels": ["bug"],
+        },
+    ),
+    (
+        "issue_write",
+        {
+            "method": "update",
+            "owner": "o",
+            "repo": "r",
+            "issue_number": 12,
+            "labels": [],
+        },
+    ),
+    (
+        "update_pull_request",
+        {"owner": "o", "repo": "r", "pullNumber": 12, "labels": ["bug"]},
+    ),
+    (
+        "label_write",
+        {"method": "delete", "owner": "o", "repo": "r", "name": "waiting-human-review"},
+    ),
+    (
+        "label_write",
+        {
+            "method": "update",
+            "owner": "o",
+            "repo": "r",
+            "name": "waiting-human-review",
+            "new_name": "x",
+        },
+    ),
+    (
+        "remove_issue_label",
+        {
+            "owner": "o",
+            "repo": "r",
+            "issue_number": 12,
+            "label": "waiting-human-review",
+        },
+    ),
 ]
 
 ALLOWED_MCP = [
-    ("pull_request_read", {"method": "get", "owner": "o", "repo": "r", "pullNumber": 12}),
+    (
+        "pull_request_read",
+        {"method": "get", "owner": "o", "repo": "r", "pullNumber": 12},
+    ),
     ("list_pull_requests", {"owner": "o", "repo": "r"}),
     ("get_branch_protection", {"owner": "o", "repo": "r", "branch": "main"}),
     ("update_pull_request_branch", {"owner": "o", "repo": "r", "pullNumber": 12}),
-    ("create_pull_request", {"owner": "o", "repo": "r", "title": "t", "head": "h", "base": "main"}),
-    ("issue_write", {"method": "create", "owner": "o", "repo": "r", "title": "t", "labels": ["bug"]}),
-    ("issue_write", {"method": "update", "owner": "o", "repo": "r", "issue_number": 12, "labels": ["bug", "waiting-human-review"]}),
-    ("issue_write", {"method": "update", "owner": "o", "repo": "r", "issue_number": 12, "state": "closed"}),
-    ("label_write", {"method": "create", "owner": "o", "repo": "r", "name": "waiting-human-review"}),
+    (
+        "create_pull_request",
+        {"owner": "o", "repo": "r", "title": "t", "head": "h", "base": "main"},
+    ),
+    (
+        "issue_write",
+        {
+            "method": "create",
+            "owner": "o",
+            "repo": "r",
+            "title": "t",
+            "labels": ["bug"],
+        },
+    ),
+    (
+        "issue_write",
+        {
+            "method": "update",
+            "owner": "o",
+            "repo": "r",
+            "issue_number": 12,
+            "labels": ["bug", "waiting-human-review"],
+        },
+    ),
+    (
+        "issue_write",
+        {
+            "method": "update",
+            "owner": "o",
+            "repo": "r",
+            "issue_number": 12,
+            "state": "closed",
+        },
+    ),
+    (
+        "label_write",
+        {"method": "create", "owner": "o", "repo": "r", "name": "waiting-human-review"},
+    ),
     ("label_write", {"method": "delete", "owner": "o", "repo": "r", "name": "stale"}),
-    ("add_issue_comment", {"owner": "o", "repo": "r", "issue_number": 12, "body": "please merge_pull_request"}),
+    (
+        "add_issue_comment",
+        {
+            "owner": "o",
+            "repo": "r",
+            "issue_number": 12,
+            "body": "please merge_pull_request",
+        },
+    ),
 ]
 
 
@@ -258,7 +351,10 @@ def _guard_matchers() -> list[str]:
 )
 def test_snippet_routes_every_route_through_the_guard(tool):
     # Claude Code matchers are full-name regexes for alternations.
-    assert any(re.fullmatch(m, tool) or (m.startswith("^") and re.search(m, tool)) for m in _guard_matchers()), tool
+    assert any(
+        re.fullmatch(m, tool) or (m.startswith("^") and re.search(m, tool))
+        for m in _guard_matchers()
+    ), tool
 
 
 def test_guard_commands_fail_closed_on_launch_failure():
@@ -282,16 +378,22 @@ def test_guard_blocks_when_the_shared_heredoc_rule_does_not_load(tmp_path: Path)
         (tmp_path / name).write_bytes((hooks / name).read_bytes())
     result = subprocess.run(
         [sys.executable, str(tmp_path / "github-authority-guard.py")],
-        input=json.dumps({"tool_name": "Bash", "tool_input": {"command": "gh pr view 1"}}),
+        input=json.dumps(
+            {"tool_name": "Bash", "tool_input": {"command": "gh pr view 1"}}
+        ),
         capture_output=True,
         text=True,
     )
     assert result.returncode == 2, result.stderr
     reason = json.loads(result.stdout)["hookSpecificOutput"]["permissionDecisionReason"]
-    assert reason.startswith("BLOCKED: gh_write.py next to this hook did not load"), reason
+    assert reason.startswith("BLOCKED: gh_write.py next to this hook did not load"), (
+        reason
+    )
     assert "secret-scanner.py" in reason, reason
 
 
 def test_guard_script_is_protected_from_agent_edits():
-    text = (ROOT / ".agents" / "hooks" / "protected-files.py").read_text(encoding="utf-8")
+    text = (ROOT / ".agents" / "hooks" / "protected-files.py").read_text(
+        encoding="utf-8"
+    )
     assert '".agents/hooks/github-authority-guard.py"' in text

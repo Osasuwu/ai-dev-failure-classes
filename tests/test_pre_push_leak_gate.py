@@ -32,7 +32,12 @@ pytestmark = pytest.mark.skipif(shutil.which("git") is None, reason="git not ins
 
 def _git(cwd: Path, *args: str) -> str:
     return subprocess.run(
-        ["git", *args], cwd=cwd, check=True, capture_output=True, text=True, encoding="utf-8"
+        ["git", *args],
+        cwd=cwd,
+        check=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
     ).stdout.strip()
 
 
@@ -218,7 +223,9 @@ def test_push_to_a_url_excludes_what_the_remote_ref_already_has(repo: Path):
 
 def test_new_branch_scans_only_commits_not_on_the_remote(repo: Path):
     _commit(repo, {"old.md": "Zorblax Quint\n"})
-    _git(repo, "push", "-q", "origin", "main")  # already public: not this push's content
+    _git(
+        repo, "push", "-q", "origin", "main"
+    )  # already public: not this push's content
     _git(repo, "checkout", "-q", "-b", "feature")
     _commit(repo, {"new.md": "nothing private\n"})
     result = _run_gate(repo, _push_line(repo, branch="feature"))
@@ -320,7 +327,9 @@ class _TerminalStdin:
         raise AssertionError("the gate read stdin from a terminal")
 
 
-def test_hook_call_with_a_terminal_on_stdin_reads_nothing_and_says_so(monkeypatch, capsys):
+def test_hook_call_with_a_terminal_on_stdin_reads_nothing_and_says_so(
+    monkeypatch, capsys
+):
     gate = _load_gate_module()
     monkeypatch.setattr(sys, "stdin", _TerminalStdin())
     assert gate.main(["pre_push_leak_gate.py", "origin", "remote-url-unused"]) == 2
@@ -386,7 +395,9 @@ def test_range_with_no_commits_says_nothing_was_checked(repo: Path):
 def test_range_that_does_not_resolve_says_nothing_was_checked(repo: Path):
     result = _run_range(repo, "no-such-branch..HEAD")
     assert result.returncode == 1
-    assert result.stderr.startswith("pre-push leak gate: could not complete the scan (git ")
+    assert result.stderr.startswith(
+        "pre-push leak gate: could not complete the scan (git "
+    )
     assert result.stderr.endswith("). Nothing was checked.\n")
 
 
@@ -423,7 +434,9 @@ def _python3_or_python_on_path() -> bool:
     return shutil.which("python3") is not None or shutil.which("python") is not None
 
 
-@pytest.mark.skipif(not _python3_or_python_on_path(), reason="no python on PATH for the hook")
+@pytest.mark.skipif(
+    not _python3_or_python_on_path(), reason="no python on PATH for the hook"
+)
 def test_installed_hook_blocks_a_real_git_push(repo: Path):
     _install_hook(repo)
     before = _git(repo, "rev-parse", "origin/main")
@@ -442,7 +455,9 @@ def test_installed_hook_blocks_a_real_git_push(repo: Path):
     assert _git(remote, "rev-parse", "main") == before
 
 
-@pytest.mark.skipif(not _python3_or_python_on_path(), reason="no python on PATH for the hook")
+@pytest.mark.skipif(
+    not _python3_or_python_on_path(), reason="no python on PATH for the hook"
+)
 def test_installed_hook_lets_a_clean_git_push_through(repo: Path):
     _install_hook(repo)
     head = _commit(repo, {"notes.md": "nothing private\n"})
@@ -458,7 +473,9 @@ def test_installed_hook_lets_a_clean_git_push_through(repo: Path):
     assert _git(repo.parent / "remote.git", "rev-parse", "main") == head
 
 
-@pytest.mark.skipif(not _python3_or_python_on_path(), reason="no python on PATH for the hook")
+@pytest.mark.skipif(
+    not _python3_or_python_on_path(), reason="no python on PATH for the hook"
+)
 def test_installed_hook_on_an_up_to_date_push_says_nothing_was_checked(repo: Path):
     """Git runs pre-push with no lines when nothing is new; that passes, but is not clean."""
     _install_hook(repo)
@@ -471,7 +488,9 @@ def test_installed_hook_on_an_up_to_date_push_says_nothing_was_checked(repo: Pat
         env=_env(FAKE_LITERAL),
     )
     assert result.returncode == 0, result.stderr
-    gate_lines = [ln for ln in result.stderr.splitlines() if ln.startswith("pre-push leak gate")]
+    gate_lines = [
+        ln for ln in result.stderr.splitlines() if ln.startswith("pre-push leak gate")
+    ]
     assert gate_lines == [
         "pre-push leak gate: nothing checked - git sent no ref updates, so there is nothing to "
         "push."

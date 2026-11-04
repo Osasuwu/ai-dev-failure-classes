@@ -97,7 +97,9 @@ def git(*args: str, check: bool = True) -> str:
         capture_output=True,
     )
     if check and result.returncode != 0:
-        raise GitError(f"git {args[0]} failed: {result.stderr.decode('utf-8', 'replace').strip()}")
+        raise GitError(
+            f"git {args[0]} failed: {result.stderr.decode('utf-8', 'replace').strip()}"
+        )
     return result.stdout.decode("utf-8", errors="replace")
 
 
@@ -106,7 +108,10 @@ def is_zero(sha: str) -> bool:
 
 
 def object_exists(spec: str) -> bool:
-    return subprocess.run(["git", "cat-file", "-e", spec], capture_output=True).returncode == 0
+    return (
+        subprocess.run(["git", "cat-file", "-e", spec], capture_output=True).returncode
+        == 0
+    )
 
 
 def empty_tree() -> str:
@@ -316,7 +321,10 @@ def run_range(rev_range: str) -> int:
     shown = scan.shown(rev_range)
     commits = git("rev-list", "--end-of-options", rev_range).split()
     if not commits:
-        print(f"{PREFIX}: nothing checked - range {shown} holds no commits.", file=sys.stderr)
+        print(
+            f"{PREFIX}: nothing checked - range {shown} holds no commits.",
+            file=sys.stderr,
+        )
         return 1
     base_of_root = empty_tree()
     for commit in commits:

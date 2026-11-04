@@ -130,13 +130,18 @@ try:
         literals_from_env,
     )
 except Exception as exc:  # noqa: BLE001 - any import failure must block, not pass
-    print(f"{PREFIX}: cannot load the literal matcher ({exc}); blocking.", file=sys.stderr)
+    print(
+        f"{PREFIX}: cannot load the literal matcher ({exc}); blocking.", file=sys.stderr
+    )
     sys.exit(BLOCK)
 try:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from gh_write import gh_writes, is_gh_binary  # noqa: E402
 except Exception as exc:  # noqa: BLE001 - any import failure must block, not pass
-    print(f"{PREFIX}: cannot load the gh-write detector ({exc}); blocking.", file=sys.stderr)
+    print(
+        f"{PREFIX}: cannot load the gh-write detector ({exc}); blocking.",
+        file=sys.stderr,
+    )
     sys.exit(BLOCK)
 
 _ARG = r"(\"[^\"]*\"|'[^']*'|[^\s;&|]+)"
@@ -172,8 +177,24 @@ _WRITE_CONSTRUCT = re.compile(
     re.IGNORECASE | re.VERBOSE,
 )
 _API_VALUE_FLAGS = frozenset(
-    ("-X", "--method", "-H", "--header", "-f", "--raw-field", "-F", "--field", "--input",
-     "-q", "--jq", "-t", "--template", "-p", "--preview", "--cache")
+    (
+        "-X",
+        "--method",
+        "-H",
+        "--header",
+        "-f",
+        "--raw-field",
+        "-F",
+        "--field",
+        "--input",
+        "-q",
+        "--jq",
+        "-t",
+        "--template",
+        "-p",
+        "--preview",
+        "--cache",
+    )
 )
 
 
@@ -218,9 +239,13 @@ def unquote(arg: str) -> str:
 
 def resolve(path: str, base: Path) -> Path:
     if os.name == "nt":
-        tmp = re.match(r"^/tmp(/|$)", path)  # Git Bash mounts /tmp on the Windows temp dir
+        tmp = re.match(
+            r"^/tmp(/|$)", path
+        )  # Git Bash mounts /tmp on the Windows temp dir
         if tmp:
-            temp_dir = os.environ.get("TEMP") or os.environ.get("TMP") or tempfile.gettempdir()
+            temp_dir = (
+                os.environ.get("TEMP") or os.environ.get("TMP") or tempfile.gettempdir()
+            )
             path = f"{temp_dir}/{path[5:]}"
         drive = re.match(r"^/([A-Za-z])(/|$)", path)
         if drive:
@@ -293,7 +318,9 @@ def split_steps(cmd: str, powershell: bool) -> list[Step] | None:
     heredocs and here-strings. None when the command cannot be split with confidence."""
     escape = "`" if powershell else "\\"
     steps: list[Step] = []
-    stack: list[str] = []  # '"' double quote, '(' parenthesis, '`' bash command substitution
+    stack: list[
+        str
+    ] = []  # '"' double quote, '(' parenthesis, '`' bash command substitution
     pending: list[tuple[str, bool]] = []
     start = i = 0
     n = len(cmd)
@@ -339,7 +366,9 @@ def split_steps(cmd: str, powershell: bool) -> list[Step] | None:
             i = close + 3
             continue
         if c == "'":
-            if not powershell and i > 0 and cmd[i - 1] == "$":  # bash $'...' takes escapes
+            if (
+                not powershell and i > 0 and cmd[i - 1] == "$"
+            ):  # bash $'...' takes escapes
                 j = i + 1
                 while j < n and cmd[j] != "'":
                     j += 2 if cmd[j] == "\\" else 1
@@ -399,7 +428,11 @@ def split_steps(cmd: str, powershell: bool) -> list[Step] | None:
                 sep = cmd[i : i + 2]
             elif c in ";|":
                 sep = "|&" if cmd.startswith("|&", i) else c
-            elif c == "&" and cmd[i - 1 : i] not in (">", "<") and cmd[i + 1 : i + 2] != ">":
+            elif (
+                c == "&"
+                and cmd[i - 1 : i] not in (">", "<")
+                and cmd[i + 1 : i + 2] != ">"
+            ):
                 sep = "&"
             if sep:
                 steps.append(Step(start, i, sep))
@@ -453,7 +486,9 @@ def step_target(text: str) -> str | None:
     if any(t.startswith(("GH_HOST=", "GH_REPO=")) for t in tokens[:at]):
         return None
     found: list[str | None] = []
-    command: str | None = None  # the gh subcommand: the first argument that is not a flag
+    command: str | None = (
+        None  # the gh subcommand: the first argument that is not a flag
+    )
     endpoint_next = False
     args = tokens[at + 1 :]
     i = 0
@@ -559,7 +594,9 @@ def check_bash(tool_input: dict, cwd: Path, powershell: bool) -> int:
                     "gh in a call of its own."
                 )
             try:
-                contents = resolve(path, base).read_text(encoding="utf-8", errors="replace")
+                contents = resolve(path, base).read_text(
+                    encoding="utf-8", errors="replace"
+                )
             except FileNotFoundError:
                 return deny_body(
                     f"could not read body file {shown}: it does not exist (yet), so it was "
@@ -573,7 +610,9 @@ def check_bash(tool_input: dict, cwd: Path, powershell: bool) -> int:
                 )
             hit_in_file = matcher.search(contents)
             if hit_in_file:
-                findings.append(f"body file {shown}, {line_col(contents, hit_in_file.start())}")
+                findings.append(
+                    f"body file {shown}, {line_col(contents, hit_in_file.start())}"
+                )
         for p in range(scan_from, step.end):
             scanned[p] = True
     sent = "".join(
@@ -621,7 +660,9 @@ def check_github_mcp(tool_input: dict) -> int:
     for field, text in iter_strings(tool_input):
         found = matcher.search(text)
         if found:
-            name = "<field name withheld: it matches>" if matcher.search(field) else field
+            name = (
+                "<field name withheld: it matches>" if matcher.search(field) else field
+            )
             findings.append(f"field {name}, {line_col(text, found.start())}")
     return hit(findings, "") if findings else 0
 

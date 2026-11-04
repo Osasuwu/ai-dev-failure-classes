@@ -46,11 +46,16 @@ def _guard_blocks(command: str, tool: str = "Bash") -> bool:
     )
     assert result.returncode in (0, 2), result.stderr
     if result.returncode == 2:
-        assert json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"] == "deny"
+        assert (
+            json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"]
+            == "deny"
+        )
     return result.returncode == 2
 
 
-def _literal_gate(command: str, tool: str = "Bash", literals: str | None = FAKE_LITERALS):
+def _literal_gate(
+    command: str, tool: str = "Bash", literals: str | None = FAKE_LITERALS
+):
     with tempfile.TemporaryDirectory() as empty_home:
         env = dict(os.environ)
         env.pop("PERSONAL_LITERALS", None)
@@ -81,15 +86,27 @@ SHAPES = [
     ("GH.EXE", "GH.EXE {g} {v} {a}", "Bash"),
     ("double-quoted", '"gh" {g} {v} {a}', "Bash"),
     ("single-quoted exe", "'gh.exe' {g} {v} {a}", "Bash"),
-    ("quoted path with spaces", '"C:/Program Files/GitHub CLI/gh.exe" {g} {v} {a}', "Bash"),
-    ("quoted backslash path", "'C:\\Program Files\\GitHub CLI\\gh.exe' {g} {v} {a}", "Bash"),
+    (
+        "quoted path with spaces",
+        '"C:/Program Files/GitHub CLI/gh.exe" {g} {v} {a}',
+        "Bash",
+    ),
+    (
+        "quoted backslash path",
+        "'C:\\Program Files\\GitHub CLI\\gh.exe' {g} {v} {a}",
+        "Bash",
+    ),
     ("unquoted backslash path", "C:\\tools\\gh.exe {g} {v} {a}", "PowerShell"),
     ("posix path", "/usr/bin/gh {g} {v} {a}", "Bash"),
     ("PowerShell call operator", '& "gh.exe" {g} {v} {a}', "PowerShell"),
     ("-R before the subcommand", "gh -R o/r {g} {v} {a}", "Bash"),
     ("--repo= before the subcommand", "gh --repo=o/r {g} {v} {a}", "Bash"),
     ("-R glued to its value", "gh -Ro/r {g} {v} {a}", "Bash"),
-    ("--hostname before the subcommand", "gh --hostname github.example {g} {v} {a}", "Bash"),
+    (
+        "--hostname before the subcommand",
+        "gh --hostname github.example {g} {v} {a}",
+        "Bash",
+    ),
     ("-R between group and verb", "gh {g} -R o/r {v} {a}", "Bash"),
     ("bash -c", 'bash -c "gh {g} {v} {a}"', "Bash"),
     ("sh -c", "sh -c 'gh -R o/r {g} {v} {a}'", "Bash"),
@@ -101,28 +118,43 @@ SHAPES = [
     ("cmd /c", 'cmd /c "gh {g} {v} {a}"', "Bash"),
     ("eval", 'eval "gh {g} {v} {a}"', "Bash"),
     ("Invoke-Expression", "Invoke-Expression 'gh {g} {v} {a}'", "PowerShell"),
-    ("ssh remote command", 'ssh -p 2222 -o BatchMode=yes host "gh {g} {v} {a}"', "Bash"),
+    (
+        "ssh remote command",
+        'ssh -p 2222 -o BatchMode=yes host "gh {g} {v} {a}"',
+        "Bash",
+    ),
     ("backticks", "echo `gh {g} {v} {a}`", "Bash"),
     ("command substitution", "echo $(gh {g} {v} {a})", "Bash"),
     ("after another step", "git push && gh {g} {v} {a}", "Bash"),
     # A heredoc fed to an interpreter is its standard input: the body runs (#285).
     ("bash heredoc", "bash <<'EOF'\ngh {g} {v} {a}\nEOF", "Bash"),
     ("ssh heredoc", "ssh host <<EOF\necho start\ngh {g} {v} {a}\nEOF", "Bash"),
-    ("tab-stripped heredoc to a path-qualified shell, after a step",
-     "git fetch && /usr/bin/bash -s <<-EOF\n\tgh {g} {v} {a}\n\tEOF\necho done", "Bash"),
+    (
+        "tab-stripped heredoc to a path-qualified shell, after a step",
+        "git fetch && /usr/bin/bash -s <<-EOF\n\tgh {g} {v} {a}\n\tEOF\necho done",
+        "Bash",
+    ),
     # `bash -c` runs what `cat` prints, so the body is the script.
-    ("bash -c substitution of a heredoc", "bash -c \"$(cat <<'EOF'\ngh {g} {v} {a}\nEOF\n)\"", "Bash"),
+    (
+        "bash -c substitution of a heredoc",
+        "bash -c \"$(cat <<'EOF'\ngh {g} {v} {a}\nEOF\n)\"",
+        "Bash",
+    ),
 ]
 
 
-@pytest.mark.parametrize(("template", "tool"), [s[1:] for s in SHAPES], ids=[s[0] for s in SHAPES])
+@pytest.mark.parametrize(
+    ("template", "tool"), [s[1:] for s in SHAPES], ids=[s[0] for s in SHAPES]
+)
 def test_both_hooks_gate_the_same_shape(template, tool):
     def shape(g, v, a):
         return template.format(g=g, v=v, a=a)
 
     assert _guard_blocks(shape("pr", "merge", "5"), tool), "guard let the merge through"
     assert not _guard_blocks(shape("pr", "view", "5"), tool), "guard blocked a read"
-    _assert_literal_hit(_literal_gate(shape("pr", "comment", f"5 --body {LITERAL}"), tool))
+    _assert_literal_hit(
+        _literal_gate(shape("pr", "comment", f"5 --body {LITERAL}"), tool)
+    )
     clean = _literal_gate(shape("pr", "comment", "5 --body clean"), tool)
     assert clean.returncode == 0, clean.stderr
     read = _literal_gate(shape("issue", "list", f"--search {LITERAL}"), tool)
@@ -175,7 +207,9 @@ def test_api_input_to_an_issue_is_guarded_and_its_file_scanned(tmp_path: Path):
 
 def _encoded(command: str) -> str:
     """pwsh -EncodedCommand takes base64 of UTF-16LE text."""
-    return "pwsh -EncodedCommand " + base64.b64encode(command.encode("utf-16-le")).decode()
+    return (
+        "pwsh -EncodedCommand " + base64.b64encode(command.encode("utf-16-le")).decode()
+    )
 
 
 def test_an_encoded_gh_write_is_blocked_by_both_and_an_encoded_read_by_neither():

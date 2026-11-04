@@ -207,7 +207,9 @@ def _held_by_the_gate(definition) -> set[str]:
 
 
 def test_the_script_and_the_gate_hold_the_same_paths_under_the_shipped_definition():
-    definition = json.loads((ROOT / ".github" / "hold-paths.json").read_text(encoding="utf-8"))
+    definition = json.loads(
+        (ROOT / ".github" / "hold-paths.json").read_text(encoding="utf-8")
+    )
     held = _held_by_the_script(ROOT)
     assert held == _held_by_the_gate(definition)
     assert {"README.md", "docs/guide.md", "incidents/incidents.csv"} <= held
@@ -289,7 +291,9 @@ def test_a_failed_compare_holds():
 
 
 def test_a_compare_at_its_300_file_cap_holds():
-    out = _run("synchronize", ["docs/a.md"], pushed=[f"scripts/s{i}.py" for i in range(300)])
+    out = _run(
+        "synchronize", ["docs/a.md"], pushed=[f"scripts/s{i}.py" for i in range(300)]
+    )
     assert out["added"] == [LABEL]
     assert out["failed"]
 

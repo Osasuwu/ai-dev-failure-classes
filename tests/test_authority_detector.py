@@ -99,7 +99,9 @@ def _run(event_name, payload, open_issues=()):
     src = HARNESS.replace("__SCRIPT__", _script())
     proc = subprocess.run(
         [NODE, "-e", src],
-        input=json.dumps({"eventName": event_name, "payload": payload, "open": list(open_issues)}),
+        input=json.dumps(
+            {"eventName": event_name, "payload": payload, "open": list(open_issues)}
+        ),
         capture_output=True,
         text=True,
         encoding="utf-8",
