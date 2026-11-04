@@ -62,3 +62,11 @@ INC-060,absence-read-as-success,review,issue,primary,https://github.com/anthropi
 INC-061,absence-read-as-success,review,issue,primary,https://github.com/anthropics/claude-code/issues/59712
 INC-062,absence-read-as-success,review,issue,primary,https://github.com/anthropics/claude-code-action/issues/1361
 INC-063,absence-read-as-success,review,issue,primary,https://github.com/jadedm/claude-review-action/issues/15
+INC-250,proxy-optimisation,code,issue,primary,https://github.com/anthropics/claude-code/issues/7074
+INC-251,proxy-optimisation,code,issue,primary,https://github.com/anthropics/claude-code/issues/34132
+INC-252,proxy-optimisation,code,issue,primary,https://github.com/anthropics/claude-code/issues/41350
+INC-253,proxy-optimisation,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/652
+INC-254,proxy-optimisation,review,pull request,primary,https://github.com/Osasuwu/jarvis/pull/1011
+INC-255,proxy-optimisation,ci,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/78
+INC-256,proxy-optimisation,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/64
+INC-257,proxy-optimisation,review,pull request,private,"private, not verifiable"
