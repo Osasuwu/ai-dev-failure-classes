@@ -75,13 +75,13 @@ Cheapest first. The first rungs ask the agent to check; the middle ones give it 
 
 ### Report: show the evidence, not the verdict
 
-- **Source:** [Claude Code best practices](https://code.claude.com/docs/en/best-practices): "Have Claude show evidence rather than asserting success: the test output, the command it ran and what it returned, or a screenshot of the result."
+- **Source:** [Claude Code best practices](https://code.claude.com/docs/en/best-practices): "Whichever option you use, ask Claude for evidence: the command it ran and its output, or the screenshot."
 - **Cost:** Longer reports, and the reader's time to read the evidence.
 - **Breaks when:** The evidence is text the agent wrote, so it is a claim too until the reader matches it to a run: in INC-009 the report gave a total the real run did not have. A reader who skims the evidence is back to reading the verdict.
 
 ### Grounding: give the agent the documentation for the versions you use
 
-- **Source:** [Context7](https://github.com/upstash/context7), which "pulls up-to-date, version-specific documentation and code examples straight from the source — and places them directly into your prompt."; a study of documentation retrieval, not of Context7, is in Evidence.
+- **Source:** [Context7](https://github.com/upstash/context7), which "pulls up-to-date, version-specific documentation and code examples straight from the source — and gives them to your coding agent."; a study of documentation retrieval, not of Context7, is in Evidence.
 - **Cost:** Tokens for the documentation in context; setting up the server.
 - **Breaks when:** The agent does not ask for the documentation. The documentation can be wrong: [Context7](https://github.com/upstash/context7) says it "cannot guarantee the accuracy, completeness, or security of all library documentation." In a benchmark that used the authors' own retriever set to 50% precision, not Context7, retrieval made results worse on APIs the model already knew well (see Evidence).
 
@@ -111,7 +111,7 @@ Cheapest first. The first rungs ask the agent to check; the middle ones give it 
 
 ### Checks: give the agent a check to run, and read its exit code
 
-- **Source:** [Claude Code best practices](https://code.claude.com/docs/en/best-practices): "Give Claude a check it can run: tests, a build, a screenshot to compare."; [pytest exit codes](https://docs.pytest.org/en/stable/reference/exit-codes.html), where exit code 5 means no tests were collected.
+- **Source:** [Claude Code best practices](https://code.claude.com/docs/en/best-practices): "Give Claude something it can run that comes back pass or fail."; [pytest exit codes](https://docs.pytest.org/en/stable/reference/exit-codes.html), where exit code 5 means no tests were collected.
 - **Cost:** Writing and keeping the check; the time or CI minutes of each run.
 - **Breaks when:** The agent reports on the check instead of the check reporting: a run the agent says it made is a claim like any other (INC-007). A run that tested nothing can look like a pass: a test filter that matches nothing makes pytest exit with code 5, and a script that treats only code 1 as failure reads that as green.
 
@@ -129,9 +129,9 @@ Cheapest first. The first rungs ask the agent to check; the middle ones give it 
 
 ### Review: verify in a fresh context, with tools
 
-- **Source:** [Prompting Claude Fable 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5): "Separate, fresh-context verifier subagents tend to outperform self-critique."; [Claude Code best practices](https://code.claude.com/docs/en/best-practices): "A fresh context improves code review since Claude won't be biased toward code it just wrote."
+- **Source:** [Prompting Claude Fable 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5): "Separate, fresh-context verifier subagents tend to outperform self-critique."; [Claude Code best practices](https://code.claude.com/docs/en/best-practices) says of `/code-review` that it "reviews the diff in a fresh subagent that never saw your conversation. It isn't swayed by the reasoning that produced the code."
 - **Cost:** Tokens for a second agent; the time to act on what it finds.
-- **Breaks when:** The verifier only reads. One that cannot run anything judges the report on plausibility again: Google's [Jules critic](https://developers.googleblog.com/meet-jules-sharpest-critic-and-most-valuable-ally/), in its first version (as of 2025-08), "evaluates the final output in a single pass", with tool calls a stated future milestone. Models judging whether an agent succeeded were weak judges in one study, close to chance on one benchmark (see Evidence). It also finds problems in sound work: "A reviewer prompted to find gaps will usually report some, even when the work is sound, because that is what it was asked to do." ([Claude Code best practices](https://code.claude.com/docs/en/best-practices))
+- **Breaks when:** The verifier only reads. One that cannot run anything judges the report on plausibility again: Google's [Jules critic](https://developers.googleblog.com/meet-jules-sharpest-critic-and-most-valuable-ally/), in its first version (as of 2025-08), "evaluates the final output in a single pass", with tool calls a stated future milestone. Models judging whether an agent succeeded were weak judges in one study, close to chance on one benchmark (see Evidence). It also reports problems because it was asked to find them: "A reviewer that's asked to find problems will always find *something*." ([Claude Code best practices](https://code.claude.com/docs/en/best-practices))
 
 ### Review: check quoted text against its source mechanically
 
@@ -141,13 +141,13 @@ Cheapest first. The first rungs ask the agent to check; the middle ones give it 
 
 ### Mechanism: a goal the session cannot end before an evaluator agrees
 
-- **Source:** [Claude Code best practices](https://code.claude.com/docs/en/best-practices): "A separate evaluator re-checks it after every turn and Claude keeps working until the goal resolves."; the [hooks reference](https://code.claude.com/docs/en/hooks) describes `/goal` as "a built-in shortcut for a session-scoped prompt-based Stop hook".
+- **Source:** [Claude Code best practices](https://code.claude.com/docs/en/best-practices): a `/goal` "sets a condition that a separate model checks against the conversation after every turn, and Claude keeps going until it's met."; the [hooks reference](https://code.claude.com/docs/en/hooks) describes `/goal` as "a built-in shortcut for a session-scoped prompt-based Stop hook".
 - **Cost:** The evaluator's tokens on every turn.
-- **Breaks when:** The evaluator is a model reading the session, so the same plausible report can satisfy it. [The documentation](https://code.claude.com/docs/en/best-practices) also says "If Claude stalls, Claude Code eventually stops the run with the goal still set".
+- **Breaks when:** The evaluator is a model reading the session, so the same plausible report can satisfy it. [The goal documentation](https://code.claude.com/docs/en/goal) also says "If Claude keeps answering the evaluator without making progress (no tool use for several turns in a row), Claude Code stops the loop, prints a warning, and returns control to you with the goal still set."
 
 ### Mechanism: a Stop hook that runs the check as a script
 
-- **Source:** [Claude Code best practices](https://code.claude.com/docs/en/best-practices): "a Stop hook runs your check as a script and blocks the turn from ending until it passes."; [Claude Code hooks](https://code.claude.com/docs/en/hooks)
+- **Source:** [Claude Code best practices](https://code.claude.com/docs/en/best-practices): "a `Stop` hook runs your script whenever Claude tries to end its turn, and sends Claude back to work if the script exits with code 2."; [Claude Code hooks](https://code.claude.com/docs/en/hooks)
 - **Cost:** Writing the script; the check's run time at every stop.
 - **Breaks when:** Stop hooks have blocked eight times in a row: "after stop hooks have continued the turn eight times in a row, Claude Code overrides the next block and ends the turn." ([Claude Code hooks](https://code.claude.com/docs/en/hooks)). The count resets whenever the agent calls a tool, and an environment variable raises the cap. Without valid JSON on stdout, a script that exits with code 1 does not block: the same page treats it as a non-blocking error. And the hook checks only what its script checks.
 
