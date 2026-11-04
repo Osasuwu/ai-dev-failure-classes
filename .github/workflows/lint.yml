@@ -24,10 +24,11 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install ruff at the pinned version
+        id: install
         run: pip install -r .github/ruff-requirements.txt
       - name: Lint
         run: ruff check .
       - name: Format
-        # Runs even when Lint fails, so one run reports both.
-        if: success() || failure()
+        # Runs even when Lint fails, so one run reports both; not when ruff failed to install.
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: ruff format --check .
