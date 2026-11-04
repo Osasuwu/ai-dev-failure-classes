@@ -39,9 +39,9 @@ Each `INC-` ID is a row in [`incidents/incidents.csv`](../../incidents/incidents
 
 ## Mechanism
 
-**Every check is written for the request.** The test the agent adds tests the fix; the reviewer reads the pull request against the issue; the type check and the linter pass on code that does the wrong thing. None of them was told what else might change, so an extra change is checked only where an existing test happens to reach it. In INC-304 the blank page came from the part nobody asked for, and the type check was green throughout. A study of plausible patches on a public benchmark puts a number on it: "even more (29.6%) plausible patches induce different behavior than the ground truth patches", the largest share of them "similar, but divergent implementations", followed by "generated patches that adapt more behavior than the ground truth patches (27.3%)" ([PatchDiff](https://arxiv.org/abs/2503.15223)). Those patches pass the tests that came with the task. This is the part of the class that borders on the class tests that cannot fail: the oracle covers only what was required. The trigger is different, because here the agent makes the change no oracle was looking for.
+**Every check is written for the request.** The test the agent adds tests the fix; the reviewer reads the pull request against the issue; the type check and the linter pass on code that does the wrong thing. None of them was told what else might change, so an extra change is checked only where an existing test happens to reach it. In INC-304 the blank page came from the part nobody asked for, and the type check was green throughout. A study of plausible patches on a public benchmark puts a number on it: "even more (29.6%) plausible patches induce different behavior than the ground truth patches", the largest share of them "similar, but divergent implementations", followed by "generated patches that adapt more behavior than the ground truth patches (27.3%)" ([PatchDiff](https://arxiv.org/abs/2503.15223)). Those patches pass the tests that came with the task. This is the part of the class that borders on the class tests that cannot fail: the tests cover only what was required. The trigger is different, because here the agent makes the change no test was looking for.
 
-**The agent's own summary describes the request, not the diff.** A pull request body, a commit message or a final message in the session is written from the task. In INC-301 the body said "No runtime logic changes" ([pull request](https://github.com/DSTech-876/Trading-Web/pull/380)) over a diff that changed the runtime; in INC-307 the commit message called a rewritten Makefile the removal of deprecated commands, and the development and deploy targets were gone.
+**The agent's own summary describes the request, not the diff.** A pull request body or a commit message is written from the task. In INC-301 the body said "No runtime logic changes" ([pull request](https://github.com/DSTech-876/Trading-Web/pull/380)) over a diff that changed the runtime; in INC-307 the commit message called a rewritten Makefile the removal of deprecated commands, and the development and deploy targets were gone.
 
 **Models widen the task, and vendors say so.** One vendor's guidance for its own model says it "can also expand the scope of a task, adding steps that weren't requested" ([Opus 5 prompting](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)); for another model the same vendor says of unrequested additions: "It does this at every effort level, and more at higher effort." ([Sonnet 5.5 prompting](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5)). A benchmark of minimal bug fixes found over-editing "widespread even among strong models like GPT-5.5" ([Zhu et al.](https://arxiv.org/abs/2609.04061)), and in a study of agent pull requests, more than three times as many agent ones as human ones had several objectives (see Evidence).
 
@@ -55,7 +55,7 @@ Each `INC-` ID is a row in [`incidents/incidents.csv`](../../incidents/incidents
 
 ## Where it surfaces
 
-At code, when the person running the agent sees the extra change in the session or in the running app before anything is pushed (INC-304, INC-306, INC-309). At review, when a reviewer, human or bot, compares the diff with the issue and names the changes nobody asked for (INC-300, INC-303). At merge, when such a comment exists and the pull request merges anyway (INC-302). After merge, when a user, a failing job or a production process meets the extra change (INC-301, INC-305, INC-307, INC-308). The stages are spelled as in `docs/vocabularies.json`.
+At code, when the person running the agent sees the extra change in the session or in the running app before anything is pushed (INC-304, INC-306, INC-309). At review, when a reviewer, human or bot, compares the diff with the issue and names the changes nobody asked for (INC-300; INC-303, a bug fix that also edited the repository's agent skill file, which the maintainer asked to have reverted). At merge, when such a comment exists and the pull request merges anyway (INC-302). After merge, when a user, a failing job or a production process meets the extra change (INC-301, INC-305, INC-307, INC-308). The stages are spelled as in `docs/vocabularies.json`.
 
 ## Protections
 
@@ -67,7 +67,7 @@ Cheapest first. The first rungs make an extra change less likely, or cheap to ta
 - **Cost:** Tokens for the instruction, in the prompt or in the project's instruction file.
 - **Breaks when:** The instruction is context, not enforcement ([Claude Code memory](https://code.claude.com/docs/en/memory.md)); in INC-305 and INC-308 such rules were in force and the agent went past them. A measured preservation instruction reduced over-editing and did not remove it (see Evidence). Another instruction pulls the other way, such as a rule to keep the linter green (INC-306).
 
-### Undo: keep a checkpoint, so an extra change can be taken back without losing the requested one
+### Undo: keep a checkpoint, so the agent's edits can be rewound
 
 - **Source:** [Claude Code checkpointing](https://code.claude.com/docs/en/checkpointing.md) tracks the agent's file edits so they can be rewound; [Gemini CLI checkpointing](https://geminicli.com/docs/cli/checkpointing.md) snapshots the project before a change.
 - **Cost:** Disk space for the snapshots; nothing per edit.
@@ -93,7 +93,7 @@ Cheapest first. The first rungs make an extra change less likely, or cheap to ta
 
 ### Formatting: pin the formatter and check it in CI, so a diff holds no reformatting
 
-- **Source:** [Prettier](https://prettier.io/docs/install): "Even a patch release of Prettier can result in slightly different formatting", so it is pinned to an exact version, with a check in CI. [Google's reviewer guide](https://google.github.io/eng-practices/review/reviewer/looking-for.html): "The author of the CL should not include major style changes combined with other changes."
+- **Source:** [Prettier](https://prettier.io/docs/install): "Even a patch release of Prettier can result in slightly different formatting", so it is pinned to an exact version, with a check in CI. [Google's reviewer guide](https://google.github.io/eng-practices/review/reviewer/looking-for.html): (a CL, or changelist, is Google's term for a pull request): "The author of the CL should not include major style changes combined with other changes."
 - **Cost:** A CI step; one formatting commit to bring the repository in line.
 - **Breaks when:** It removes only formatting noise: a rename, a deletion, an extra feature or a changed default passes it.
 
