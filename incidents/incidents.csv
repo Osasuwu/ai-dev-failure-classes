@@ -112,6 +112,22 @@ INC-181,copies-of-one-truth-drift,code,issue,primary,https://github.com/anthropi
 INC-182,copies-of-one-truth-drift,code,issue,primary,https://github.com/anthropics/claude-code/issues/105348
 INC-183,copies-of-one-truth-drift,code,issue,primary,https://github.com/anthropics/claude-code/issues/61908
 INC-184,copies-of-one-truth-drift,code,issue,primary,https://github.com/anthropics/claude-code/issues/1342
+INC-200,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/955
+INC-201,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1104
+INC-202,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1101
+INC-203,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1479
+INC-204,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1764
+INC-205,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/163
+INC-206,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/168
+INC-207,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/170
+INC-208,silent-fallback,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/183
+INC-209,silent-fallback,code,issue,private,"private, not verifiable"
+INC-210,silent-fallback,code,issue,private,"private, not verifiable"
+INC-211,silent-fallback,code,issue,private,"private, not verifiable"
+INC-212,silent-fallback,code,issue,private,"private, not verifiable"
+INC-213,silent-fallback,code,issue,private,"private, not verifiable"
+INC-214,silent-fallback,review,issue,primary,https://github.com/anthropics/claude-code/issues/31890
+INC-215,silent-fallback,code,issue,primary,https://github.com/anthropics/claude-code/issues/21027
 INC-250,proxy-optimisation,code,issue,primary,https://github.com/anthropics/claude-code/issues/7074
 INC-251,proxy-optimisation,code,issue,primary,https://github.com/anthropics/claude-code/issues/34132
 INC-252,proxy-optimisation,code,issue,primary,https://github.com/anthropics/claude-code/issues/41350
