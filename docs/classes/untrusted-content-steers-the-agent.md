@@ -5,7 +5,7 @@ surfaces_at:
   - ci
   - review
   - after-merge
-applies_when: You run an AI coding agent that reads text other people can write (an issue, a pull request or a comment on a public repository, a support ticket, a fetched web page, a file in a cloned repository or a dependency, the output of a tool or an MCP server), and the agent holds something that text's author does not (a token, write access, a shell on your machine, secrets in a CI job); or a CI job that holds release or publish credentials can be reached by such text or by the agent.
+applies_when: You run an AI coding agent that reads text other people can write (an issue, a pull request or a comment on a public repository, a support ticket, a fetched web page, a file in a cloned repository or a dependency, the output of a tool or of an MCP (Model Context Protocol) server), and the agent holds something that text's author does not (a token, write access, a shell on your machine, secrets in a CI job); or a CI job that holds release or publish credentials can be reached by such text or by the agent.
 applies_when_not: An allow or deny list that a command or a path gets past, when the user's own request chose the action (pattern-matched-boundaries). The damage an action does once it is chosen (irreversible-effects). The agent changing more than it was asked, with no outside text involved (scope-overreach).
 ---
 
@@ -13,7 +13,7 @@ applies_when_not: An allow or deny list that a command or a path gets past, when
 
 ## TL;DR
 
-An agent reads text someone else wrote, takes an instruction in it for part of its task, and carries it out with your access: it copies private data to a public place, runs a command, or, in CI, uses the job's tokens. The agent's answer to you looks normal. What protects is keeping untrusted text, private data and a way out of the same session apart, and keeping release and publish credentials out of any job that untrusted text or an agent can reach.
+An agent reads text someone else wrote, takes an instruction in it for part of its task, and carries it out with your access: it copies private data to a public place, runs a command, or, in CI, uses the job's tokens. The agent's answer to you looks normal. What protects is keeping untrusted text, private data and a way out (any channel that carries data to someone outside) from meeting in one session, and keeping release and publish credentials out of any job that untrusted text or an agent can reach.
 
 ## Symptom
 
@@ -25,13 +25,13 @@ Nobody on your side asked for what the agent did, and the session or the job log
 - the agent's own settings change after it opens a repository someone else wrote;
 - a version of your package appears on the registry that you did not release, and the credential that published it was one your CI job held.
 
-The agent's answer to you usually describes the task you gave it; the extra action shows only in the log, the diff or the outside system.
+The agent's answer to you can describe only the task you gave it, so the extra action may show only in the log, the diff or the outside system.
 
 ## Examples
 
 Each `INC-` ID is a row in [`incidents/incidents.csv`](../../incidents/incidents.csv), which links its source and says how strong that source is. None of them comes from the maintainer's own repositories.
 
-- INC-550: a user asked an agent connected to a code host's official MCP server to look at the open issues of a public repository; one issue, written by an attacker, told it to collect data from the user's private repositories, and the agent put that data in a pull request on the public repository. A researcher's proof of concept, not an attack seen in the wild.
+- INC-550: a user asked an agent connected to a code host's official MCP (Model Context Protocol) server to look at the open issues of a public repository; one issue, written by an attacker, told it to collect data from the user's private repositories, and the agent put that data in a pull request on the public repository. A researcher's proof of concept, not an attack seen in the wild.
 - INC-551: a customer wrote instructions into a support ticket; when the developer's assistant, connected to the database with a role that bypasses row-level security, read the ticket, it read a private table and copied its rows into a reply the customer could see. A researcher's demonstration on dummy data.
 - INC-555: CI workflows that put the title or body of an issue or pull request into an agent's prompt, in a job that also held a write token or other secrets, so that whoever opened the issue could steer the agent; the researchers found the pattern in workflows of at least five Fortune 500 companies and in the agent vendor's own repository, which was patched within four days of the report.
 - INC-556: an issue-triage workflow ran an agent with shell access on every new issue from any account; an issue could make it poison the CI cache that the nightly release workflows used, and so reach their publish credentials. The maintainers removed the AI workflows after public disclosure, but a publish token was not properly revoked, and an unknown actor used it to publish an unauthorized version of the project's command-line tool to the package registry.
@@ -49,11 +49,11 @@ Each `INC-` ID is a row in [`incidents/incidents.csv`](../../incidents/incidents
 
 **In CI, anyone can write the input, and the job holds the keys.** A workflow triggered by an issue or a pull request takes its title, body or comments from whoever opened it. In INC-555 those fields went straight into the agent's prompt in jobs that held a token with write access or cloud credentials; in INC-556 the workflow let any account trigger it and gave the agent a shell. The steered agent then needs no outside channel: the job's own token is the reach.
 
-**CI credentials can publish (N-D).** This is the candidate N-D, folded into this class: a job that holds release or publish credentials can be reached by untrusted input or by an agent. In INC-005 the route was a shell injection through a pull-request title, not a prompt; in INC-554 an inappropriately scoped token in a build configuration let a threat actor commit malicious code to an extension's repository, and the commit was included automatically in a release ([GHSA-7g7f-ff96-5gcw](https://github.com/aws/aws-toolkit-vscode/security/advisories/GHSA-7g7f-ff96-5gcw)); in INC-556 an agent was the route to the same kind of credential. Whoever reaches the job, the result is a release under the project's name. What that release can then do to the people who install it is the subject of [Irreversible effects](irreversible-effects.md).
+**CI credentials can publish.** This was a candidate class of its own, folded into this one: a job that holds release or publish credentials can be reached by untrusted input or by an agent. In INC-005 the route was a shell injection through a pull-request title, not a prompt; in INC-554 an inappropriately scoped token in a build configuration let a threat actor commit malicious code to an extension's repository, and the commit was included automatically in a release ([GHSA-7g7f-ff96-5gcw](https://github.com/aws/aws-toolkit-vscode/security/advisories/GHSA-7g7f-ff96-5gcw)); in INC-556 an agent was the route to the same kind of credential. Whoever reaches the job, the result is a release under the project's name. What that release can then do to the people who install it is the subject of [Irreversible effects](irreversible-effects.md).
 
-**Approval is often switched off.** The assistant in INC-550 asked before each tool call by default, but, the researchers note, many users choose to always allow and stop watching individual actions. A per-call prompt only helps when someone reads it, and in CI nobody does.
+**Approval can be switched off.** The assistant in INC-550 asked before each tool call by default, but, the researchers note, many users choose to always allow and stop watching individual actions. A per-call prompt only helps when someone reads it, and in CI nobody does.
 
-**Neighbours.** When the steered agent runs a command that an allow list was supposed to stop, the list's failure is the class [Pattern-matched boundaries](pattern-matched-boundaries.md), which also holds the case of a repository whose settings file changes the agent's permissions (N-C). This doc covers how outside text gets to choose the action; that one covers why the list did not catch it. What the action can reach once chosen is in [Irreversible effects](irreversible-effects.md).
+**Neighbours.** When the steered agent runs a command that an allow list was supposed to stop, the list's failure is the class [Pattern-matched boundaries](pattern-matched-boundaries.md), which also holds the case of a repository whose settings file changes the agent's permissions. This doc covers how outside text gets to choose the action; that one covers why the list did not catch it. What the action can reach once chosen is in [Irreversible effects](irreversible-effects.md).
 
 ## Where it surfaces
 
@@ -61,7 +61,7 @@ At code, when the developer or a researcher sees the agent's tool calls in the s
 
 ## Protections
 
-Cheapest first. The first rungs make an injected instruction less likely to land; the middle ones take away what a landed instruction can use (the trigger, the tools, the token, the network); the last ones keep untrusted text, private data and a way out from meeting in one session at all. None of them replaces the ones before; the measured rates in Evidence say why the early ones cannot stand alone.
+Cheapest first. The first rungs make an injected instruction less likely to land; the middle ones take away what a landed instruction can use (the trigger, the tools, the token, the network), or put a person in front of each call; the last ones keep untrusted text, private data and a way out from meeting in one session at all. None of them replaces the ones before; the measured rates in Evidence say why the early ones cannot stand alone.
 
 ### Prompt: mark untrusted text as data, and keep it out of the instructions
 
@@ -77,9 +77,9 @@ Cheapest first. The first rungs make an injected instruction less likely to land
 
 ### Classifier: screen untrusted input with a prompt-injection detector
 
-- **Source:** [Anthropic, prompt injection defenses](https://www.anthropic.com/research/prompt-injection-defenses): "We scan all untrusted content that enters the model's context window". The OWASP cheat sheet lists guardrail models among its defenses. The Classifier rung in [Pattern-matched boundaries](pattern-matched-boundaries.md) judges each action against the request; this one judges the input before the agent reads it.
+- **Source:** [Anthropic, prompt injection defenses](https://www.anthropic.com/research/prompt-injection-defenses): "We scan all untrusted content that enters the model's context window". The [OWASP cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html) lists guardrail models among its defenses. The Classifier rung in [Pattern-matched boundaries](pattern-matched-boundaries.md) judges each action against the request; this one judges the input before the agent reads it.
 - **Cost:** A classifier call per input; legitimate text that is flagged and held.
-- **Breaks when:** OWASP: "A guardrail LLM is itself an LLM and is itself susceptible to prompt injection", and "Screening does not stop an injection that it fails to detect". Measured evasion of deployed detectors and adaptive attacks on published defenses are in Evidence.
+- **Breaks when:** The [OWASP cheat sheet](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html): "A guardrail LLM is itself an LLM and is itself susceptible to prompt injection", and "Screening does not stop an injection that it fails to detect". Measured evasion of deployed detectors and adaptive attacks on published defenses are in Evidence.
 
 ### Way out: do not render images or links that make the client send data
 
@@ -91,13 +91,7 @@ Cheapest first. The first rungs make an injected instruction less likely to land
 
 - **Source:** [claude-code-action security](https://github.com/anthropics/claude-code-action/blob/main/docs/security.md): "The action can only be triggered by users with write access to the repository". [GitHub Copilot cloud agent risks](https://docs.github.com/en/copilot/concepts/agents/coding-agent/risks-and-mitigations): "Comments from users without write access are never presented to the agent." [run-gemini-cli trust guidance](https://github.com/google-github-actions/run-gemini-cli/blob/main/docs/trust-guidance.md): "Prefer workflows where the PR review is kicked off intentionally by a maintainer".
 - **Cost:** Outsiders cannot start the agent; a maintainer's time to start each run on their content.
-- **Breaks when:** The check is switched off: claude-code-action calls its `allowed_non_write_users` setting "a significant security risk", and the workflow in INC-556 set it to every account. "Allowed bots are not checked for repository permissions". A maintainer who starts the run checks who starts it, not what the agent will read: an outsider's issue or pull request still carries its text into the run.
-
-### Approval: ask at the tool call, and keep asking
-
-- **Source:** The [MCP tools specification](https://modelcontextprotocol.io/specification/2025-06-18/server/tools): "there SHOULD always be a human in the loop with the ability to deny tool invocations." How the prompt should name the effect, and when an approval is required at all, are the approval rungs in [Irreversible effects](irreversible-effects.md); they are not repeated here.
-- **Cost:** A person's attention on each call the agent makes.
-- **Breaks when:** The prompt is switched off: in INC-550 the assistant asked by default, and the researchers note that many users opt for an "Always Allow" policy and stop monitoring individual actions. In CI nobody is there to answer. A call that reads an issue or a table looks like the task, so a person approves it; it fails as the approval rungs in [Irreversible effects](irreversible-effects.md) describe.
+- **Breaks when:** The check is switched off: claude-code-action calls its `allowed_non_write_users` setting "a significant security risk", and the workflow in INC-556 set it to every account. The same page notes: "Allowed bots are not checked for repository permissions". A maintainer who starts the run checks who starts it, not what the agent will read: an outsider's issue or pull request still carries its text into the run.
 
 ### Tools: give the agent only the tools the task needs, and no way to write where it reads
 
@@ -115,13 +109,19 @@ Cheapest first. The first rungs make an injected instruction less likely to land
 
 - **Source:** [OpenAI, agent approvals and security](https://learn.chatgpt.com/docs/agent-approvals-security): "By default, the agent runs with network access turned off." [Claude Code sandboxing](https://code.claude.com/docs/en/sandboxing.md): "Effective sandboxing requires both filesystem and network isolation". The sandbox and container rungs in [Pattern-matched boundaries](pattern-matched-boundaries.md) and the sandbox Reach rung in [Irreversible effects](irreversible-effects.md) describe the setup; they are not repeated here.
 - **Cost:** Setup; a task that needs the network asks for each destination.
-- **Breaks when:** An allowed destination is itself a way out. Claude Code's page: "Allowing broad domains such as github.com can create paths for data exfiltration". GitHub's agentic workflows: "Domain allowlisting constrains destinations, not the safety of every request to an allowed service." In INC-550 the way out was the code host the agent was meant to use.
+- **Breaks when:** An allowed destination is itself a way out. Claude Code's page: "Allowing broad domains such as github.com can create paths for data exfiltration". [GitHub's agentic workflows](https://github.github.com/gh-aw/introduction/architecture/): "Domain allowlisting constrains destinations, not the safety of every request to an allowed service." In INC-550 the way out was the code host the agent was meant to use.
+
+### Approval: have a person confirm the agent's tool calls
+
+- **Source:** The [MCP tools specification](https://modelcontextprotocol.io/specification/2025-06-18/server/tools): "there SHOULD always be a human in the loop with the ability to deny tool invocations." How the prompt should name the effect, and when an approval is required at all, are the approval rungs in [Irreversible effects](irreversible-effects.md); they are not repeated here.
+- **Cost:** A person's attention on each call the agent makes.
+- **Breaks when:** The prompt is switched off: in INC-550 the assistant asked by default, and the researchers note that many users opt for an "Always Allow" policy and stop monitoring individual actions. In CI nobody is there to answer. A call that reads an issue or a table looks like the task, so a person approves it; it fails as the approval rungs in [Irreversible effects](irreversible-effects.md) describe.
 
 ### CI: keep untrusted triggers away from secrets and from the release workflows
 
 - **Source:** [GitHub Security Lab](https://securitylab.github.com/resources/github-actions-preventing-pwn-requests/): combining `pull_request_target` with a checkout of an untrusted pull request "is a dangerous practice". [GitHub, secure use reference](https://docs.github.com/en/actions/reference/security/secure-use): "Avoid using the pull_request_target and workflow_run workflow triggers with untrusted pull requests or code content", and for inline scripts an intermediate environment variable is "the preferred approach to handling untrusted input". [Adnan Khan, cache poisoning](https://adnanthekhan.com/2024/05/06/the-monsters-in-your-build-cache-github-actions-cache-poisoning/): "avoid using GitHub Actions caching entirely for release workflows".
 - **Cost:** Split workflows; slower release builds without the cache.
-- **Breaks when:** The environment variable stops a shell injection like the one in INC-005, not a prompt injection: the text still reaches the agent. Gating a run on a label "is still prone to a race condition", since the author can push after the label. In INC-556 the agent ran with a shell in a default-branch workflow, which is the case the cache rule names: "Never run untrusted code within the context of the main branch if any other workflows use GitHub Actions caching".
+- **Breaks when:** The environment variable stops a shell injection like the one in INC-005, not a prompt injection: the text still reaches the agent. GitHub Security Lab notes that gating a run on a label "is still prone to a race condition", since the author can push after the label. In INC-556 the agent ran with a shell in a default-branch workflow, which is the case the cache rule names: "Never run untrusted code within the context of the main branch if any other workflows use GitHub Actions caching".
 
 ### Audit: scan workflows for dangerous triggers and for outside text in prompts
 
@@ -129,7 +129,7 @@ Cheapest first. The first rungs make an injected instruction less likely to land
 - **Cost:** A CI step, and triage of its findings.
 - **Breaks when:** The risk is in what the agent may do, not in the workflow text: a rule matches the expressions in the file, and an agent that fetches the issue with its own tools leaves no expression in the file for the rule to match. The tool list and the token's reach are the other half of INC-556, and a trigger rule only flags them where the scanner models them.
 
-### Publish (N-D): keep publish credentials out of every job that untrusted text or an agent can reach
+### Publish: keep publish credentials out of every job that untrusted text or an agent can reach
 
 - **Source:** [npm trusted publishers](https://docs.npmjs.com/trusted-publishers): "we strongly recommend restricting traditional token-based publishing access", with the package setting "Require two-factor authentication and disallow tokens". [GitHub, secure use reference](https://docs.github.com/en/actions/reference/security/secure-use): with OpenID Connect you can "stop storing these credentials as long-lived secrets". Trusted publishing and a required reviewer on the release environment are the Reach and Approval rungs in [Irreversible effects](irreversible-effects.md); they are not repeated here.
 - **Cost:** Moving the release into its own workflow with short-lived credentials; a reviewer's time per release where one is required.
