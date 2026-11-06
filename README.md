@@ -50,6 +50,7 @@ Read these every time, whatever your repo looks like. They apply across classes 
 | [copies-of-one-truth-drift](docs/classes/copies-of-one-truth-drift.md) | ● | ● | ● | ● |  | ● | 35 | 31 | 26 primary, 9 private |
 | [pattern-matched-boundaries](docs/classes/pattern-matched-boundaries.md) | ● | ● |  | ● | ● | ● | 17 | 6 | 15 primary, 2 private |
 | [proxy-optimisation](docs/classes/proxy-optimisation.md) | ● | ● | ● | ● |  |  | 8 | 5 | 7 primary, 1 private |
+| [scope-overreach](docs/classes/scope-overreach.md) |  | ● |  | ● | ● | ● | 10 | 0 | 4 primary, 6 self-reported |
 
 **Candidates, not established.** No class doc and no incident evidence yet. Do not report them as classes.
 
