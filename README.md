@@ -49,6 +49,7 @@ Read these every time, whatever your repo looks like. They apply across classes 
 | [claims-from-plausibility](docs/classes/claims-from-plausibility.md) | ● | ● | ● | ● |  | ● | 17 | 13 | 13 primary, 4 private |
 | [copies-of-one-truth-drift](docs/classes/copies-of-one-truth-drift.md) | ● | ● | ● | ● |  | ● | 35 | 31 | 26 primary, 9 private |
 | [pattern-matched-boundaries](docs/classes/pattern-matched-boundaries.md) | ● | ● |  | ● | ● | ● | 17 | 6 | 15 primary, 2 private |
+| [proxy-optimisation](docs/classes/proxy-optimisation.md) | ● | ● | ● | ● |  |  | 8 | 5 | 7 primary, 1 private |
 | [scope-overreach](docs/classes/scope-overreach.md) |  | ● |  | ● | ● | ● | 10 | 0 | 4 primary, 6 self-reported |
 | [tests-that-cannot-fail](docs/classes/tests-that-cannot-fail.md) |  | ● | ● | ● |  | ● | 15 | 15 | 10 primary, 5 private |
 
