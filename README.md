@@ -48,7 +48,7 @@ Read these every time, whatever your repo looks like. They apply across classes 
 | [absence-read-as-success](docs/classes/absence-read-as-success.md) |  | ● | ● | ● | ● | ● | 23 | 18 | 14 primary, 9 private |
 | [claims-from-plausibility](docs/classes/claims-from-plausibility.md) | ● | ● | ● | ● |  | ● | 17 | 13 | 13 primary, 4 private |
 | [copies-of-one-truth-drift](docs/classes/copies-of-one-truth-drift.md) | ● | ● | ● | ● |  | ● | 35 | 31 | 26 primary, 9 private |
-| [done-is-not-the-effect](docs/classes/done-is-not-the-effect.md) | ● | ● |  | ● |  | ● | 18 | 17 | 12 primary, 6 private |
+| [done-is-not-the-effect](docs/classes/done-is-not-the-effect.md) | ● | ● |  | ● |  | ● | 17 | 16 | 12 primary, 5 private |
 | [pattern-matched-boundaries](docs/classes/pattern-matched-boundaries.md) | ● | ● |  | ● | ● | ● | 17 | 6 | 15 primary, 2 private |
 | [proxy-optimisation](docs/classes/proxy-optimisation.md) | ● | ● | ● | ● |  |  | 8 | 5 | 7 primary, 1 private |
 | [scope-overreach](docs/classes/scope-overreach.md) |  | ● |  | ● | ● | ● | 10 | 0 | 4 primary, 6 self-reported |
