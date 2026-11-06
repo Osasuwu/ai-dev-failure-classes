@@ -146,3 +146,21 @@ INC-306,scope-overreach,code,issue,self-reported,https://github.com/anthropics/c
 INC-307,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/ai-replaces-entire-file-instead-of-editing-it/163422
 INC-308,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/unauthorized-changes-by-lazy-agent/164158
 INC-309,scope-overreach,code,issue,self-reported,https://github.com/google-gemini/gemini-cli/issues/29370
+INC-450,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/37
+INC-451,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/656
+INC-452,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1260
+INC-453,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1312
+INC-454,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1393
+INC-455,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1707
+INC-456,done-is-not-the-effect,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1780
+INC-457,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/81
+INC-458,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/43
+INC-459,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/181
+INC-460,done-is-not-the-effect,code,issue,private,"private, not verifiable"
+INC-461,done-is-not-the-effect,after-merge,pull request,private,"private, not verifiable"
+INC-462,done-is-not-the-effect,after-merge,issue,private,"private, not verifiable"
+INC-463,done-is-not-the-effect,after-merge,issue,private,"private, not verifiable"
+INC-464,done-is-not-the-effect,after-merge,pull request,private,"private, not verifiable"
+INC-465,done-is-not-the-effect,after-merge,issue,private,"private, not verifiable"
+INC-466,done-is-not-the-effect,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/1702
+INC-467,done-is-not-the-effect,code,issue,primary,https://github.com/anthropics/claude-code/issues/60451
