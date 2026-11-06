@@ -78,3 +78,56 @@ INC-212,silent-fallback,code,issue,private,"private, not verifiable"
 INC-213,silent-fallback,code,issue,private,"private, not verifiable"
 INC-214,silent-fallback,review,issue,primary,https://github.com/anthropics/claude-code/issues/31890
 INC-215,silent-fallback,code,issue,primary,https://github.com/anthropics/claude-code/issues/21027
+INC-150,copies-of-one-truth-drift,after-merge,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/71
+INC-151,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/72
+INC-152,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/231
+INC-153,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/284
+INC-154,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1218
+INC-155,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1220
+INC-156,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1456
+INC-157,copies-of-one-truth-drift,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1668
+INC-158,copies-of-one-truth-drift,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1782
+INC-159,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1891
+INC-160,copies-of-one-truth-drift,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1897
+INC-161,copies-of-one-truth-drift,review,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/145
+INC-162,copies-of-one-truth-drift,review,pull request,primary,https://github.com/Osasuwu/music-intel-mcp/pull/196
+INC-163,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/209
+INC-164,copies-of-one-truth-drift,after-merge,pull request,primary,https://github.com/Osasuwu/music-intel-mcp/pull/217
+INC-165,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/224
+INC-166,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/235
+INC-167,copies-of-one-truth-drift,ci,issue,primary,https://github.com/Osasuwu/like-current-song/issues/69
+INC-168,copies-of-one-truth-drift,code,issue,primary,https://github.com/Osasuwu/like-current-song/issues/157
+INC-169,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/192
+INC-170,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/197
+INC-171,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/200
+INC-172,copies-of-one-truth-drift,after-merge,issue,private,"private, not verifiable"
+INC-173,copies-of-one-truth-drift,after-merge,issue,private,"private, not verifiable"
+INC-174,copies-of-one-truth-drift,after-merge,issue,private,"private, not verifiable"
+INC-175,copies-of-one-truth-drift,after-merge,issue,private,"private, not verifiable"
+INC-176,copies-of-one-truth-drift,after-merge,issue,private,"private, not verifiable"
+INC-177,copies-of-one-truth-drift,after-merge,issue,private,"private, not verifiable"
+INC-178,copies-of-one-truth-drift,task,issue,private,"private, not verifiable"
+INC-179,copies-of-one-truth-drift,after-merge,issue,private,"private, not verifiable"
+INC-180,copies-of-one-truth-drift,after-merge,issue,private,"private, not verifiable"
+INC-181,copies-of-one-truth-drift,code,issue,primary,https://github.com/anthropics/claude-code/issues/37137
+INC-182,copies-of-one-truth-drift,code,issue,primary,https://github.com/anthropics/claude-code/issues/105348
+INC-183,copies-of-one-truth-drift,code,issue,primary,https://github.com/anthropics/claude-code/issues/61908
+INC-184,copies-of-one-truth-drift,code,issue,primary,https://github.com/anthropics/claude-code/issues/1342
+INC-250,proxy-optimisation,code,issue,primary,https://github.com/anthropics/claude-code/issues/7074
+INC-251,proxy-optimisation,code,issue,primary,https://github.com/anthropics/claude-code/issues/34132
+INC-252,proxy-optimisation,code,issue,primary,https://github.com/anthropics/claude-code/issues/41350
+INC-253,proxy-optimisation,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/652
+INC-254,proxy-optimisation,review,pull request,primary,https://github.com/Osasuwu/jarvis/pull/1011
+INC-255,proxy-optimisation,ci,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/78
+INC-256,proxy-optimisation,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/64
+INC-257,proxy-optimisation,review,pull request,private,"private, not verifiable"
+INC-300,scope-overreach,review,pull request,primary,https://github.com/taskforcesh/nandu/pull/71
+INC-301,scope-overreach,after-merge,pull request,primary,https://github.com/DSTech-876/Trading-Web/pull/380
+INC-302,scope-overreach,merge,pull request,primary,https://github.com/github/gh-aw/pull/17029
+INC-303,scope-overreach,review,pull request,primary,https://github.com/dotnet/efcore/pull/39294
+INC-304,scope-overreach,code,issue,self-reported,https://github.com/anthropics/claude-code/issues/83531
+INC-305,scope-overreach,after-merge,issue,self-reported,https://github.com/openai/codex/issues/36666
+INC-306,scope-overreach,code,issue,self-reported,https://github.com/anthropics/claude-code/issues/57081
+INC-307,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/ai-replaces-entire-file-instead-of-editing-it/163422
+INC-308,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/unauthorized-changes-by-lazy-agent/164158
+INC-309,scope-overreach,code,issue,self-reported,https://github.com/google-gemini/gemini-cli/issues/29370
