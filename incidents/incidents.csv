@@ -146,3 +146,27 @@ INC-306,scope-overreach,code,issue,self-reported,https://github.com/anthropics/c
 INC-307,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/ai-replaces-entire-file-instead-of-editing-it/163422
 INC-308,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/unauthorized-changes-by-lazy-agent/164158
 INC-309,scope-overreach,code,issue,self-reported,https://github.com/google-gemini/gemini-cli/issues/29370
+INC-500,shared-state-without-ownership,code,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/23
+INC-501,shared-state-without-ownership,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/650
+INC-502,shared-state-without-ownership,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/874
+INC-503,shared-state-without-ownership,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/931
+INC-504,shared-state-without-ownership,after-merge,pull request,primary,https://github.com/Osasuwu/jarvis/pull/1131
+INC-505,shared-state-without-ownership,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1382
+INC-506,shared-state-without-ownership,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1383
+INC-507,shared-state-without-ownership,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1434
+INC-508,shared-state-without-ownership,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1473
+INC-509,shared-state-without-ownership,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1691
+INC-510,shared-state-without-ownership,code,issue,primary,https://github.com/Osasuwu/jarvis/issues/1788
+INC-511,shared-state-without-ownership,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1932
+INC-512,shared-state-without-ownership,task,issue,private,"private, not verifiable"
+INC-513,shared-state-without-ownership,task,issue,private,"private, not verifiable"
+INC-514,shared-state-without-ownership,review,pull request,primary,https://github.com/Osasuwu/music-intel-mcp/pull/156
+INC-515,shared-state-without-ownership,review,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/175
+INC-516,shared-state-without-ownership,code,issue,self-reported,https://github.com/anthropics/claude-code/issues/98950
+INC-517,shared-state-without-ownership,code,issue,primary,https://github.com/anthropics/claude-code/issues/104928
+INC-518,shared-state-without-ownership,code,issue,primary,https://github.com/anthropics/claude-code/issues/102657
+INC-519,shared-state-without-ownership,code,issue,primary,https://github.com/anthropics/claude-code/issues/104026
+INC-520,shared-state-without-ownership,code,issue,primary,https://github.com/anthropics/claude-code/issues/107208
+INC-521,shared-state-without-ownership,ci,issue,primary,https://github.com/anthropics/claude-code/issues/104013
+INC-522,shared-state-without-ownership,after-merge,issue,primary,https://gitlab.com/gitlab-org/gitlab/-/issues/571737
+INC-523,shared-state-without-ownership,merge,issue,primary,https://gitlab.com/gitlab-org/gitlab/-/issues/580182
