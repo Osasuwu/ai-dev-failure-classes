@@ -15,7 +15,7 @@ applies_when_not: One fact written down in several places that drift apart (copi
 
 ## TL;DR
 
-Several agents, sessions or jobs read and write one piece of state (an issue's claim, a working tree, a check name, a status record), and nothing makes one of them its owner. Work is done twice, lost, merged before its verdict, or left claimed by a run that died. What protects is a mechanism outside the agents: a separate workspace per writer, a claim made by an operation the server refuses to repeat, a conditional write, a verdict bound to the commit being merged, and a lease or sweep that frees what a dead run held. Telling agents to coordinate helps split the work; nothing enforces it.
+Several agents, sessions or jobs read and write one piece of state (an issue's claim, a working tree, a check name, a status record), and nothing makes one of them its owner. Work is done twice, lost, merged before its verdict, or left claimed by a run that died. The protections the sources describe are mechanisms outside the agents: a separate workspace per writer, a claim made by an operation the server refuses to repeat, a conditional write, a verdict bound to the commit being merged, and a lease or sweep that frees what a dead run held. No source measures how often they prevent it. Telling agents to coordinate helps split the work; nothing enforces it.
 
 ## Symptom
 
@@ -33,7 +33,7 @@ The INC- codes are rows in [the incident dataset](../../incidents/incidents.csv)
 
 ## Mechanism
 
-Each actor is correct about its own step. The defect is a piece of state that several of them write, or that one writes and another reads, with no rule for who owns it. Six forms recur in the rows of this class.
+Each actor is correct about its own step. The defect is a piece of state that several of them write, or that one writes and another reads, with no rule for who owns it. Six forms appear in the rows of this class; four recur, and two rest on one row each.
 
 **A claim made by check-then-act, or keyed on something the actors do not share.** A worker checks that nobody holds an issue, then claims it. Two workers that check in the same window both see it free; the same issues were dispatched on consecutive days under different branch names (INC-503, [Osasuwu/jarvis#931](https://github.com/Osasuwu/jarvis/issues/931)). When the check looks for a branch, a session that names its branch differently is invisible to it (INC-514). Creation that is not idempotent fails the same way: a ticket generator ran twice six minutes apart and opened two batches, 30 of them duplicates (INC-502, [Osasuwu/jarvis#874](https://github.com/Osasuwu/jarvis/issues/874)).
 
@@ -59,7 +59,7 @@ No gate sees the whole of it, because each actor's own diff and checks are corre
 
 ## Protections
 
-The rungs run from a rule the agents are told to a design in which only one actor writes. In one operator's record of this class, every patch that only told the agents what to do was followed by a recurrence, and of the mechanical checks that held where they were written, most left a sibling path unguarded: a manual run, a step invoked from prose, a copy of the workflow (as of 2026-10, private audit). In that record the claim mechanism itself did not fail; a path that did not go through it did. A rung covers the paths routed through it, not the ones around it.
+The rungs run from a rule the agents are told to a design in which only one actor writes. In one operator's record of this class, every patch that only told the agents what to do was followed by a recurrence, and of the mechanical checks that held where they were written, most left a sibling path unguarded: a manual run, a step the agent is told to run instead of one that runs for it, a copy of the workflow (as of 2026-10, private audit). In that record the claim mechanism itself did not fail; a path that did not go through it did. A rung covers the paths routed through it, not the ones around it.
 
 ### Prompt: split the work so each agent owns different files
 
@@ -73,11 +73,17 @@ The rungs run from a rule the agents are told to a design in which only one acto
 - **Cost:** a few API calls per start.
 - **Breaks when:** the check is keyed on a name the actors do not share, such as two branch-naming conventions (INC-514); two workers check in the same window, since check-then-act is not atomic (INC-503); the field it reads means something else to another tool (INC-511).
 
+### Reconcile outcomes on a schedule
+
+- **Source:** Kubernetes [controllers](https://kubernetes.io/docs/concepts/architecture/controller/): "a control loop is a non-terminating loop that regulates the state of a system", comparing the desired state with the current one and acting on the difference. Applied here, a scheduled job checks outcomes rather than paths: at most one open pull request per issue, no claim without a live run, no "blocked by" link to a closed issue.
+- **Cost:** one scheduled job and the time to write each invariant.
+- **Breaks when:** the invariant is not written, so the loop does not compare it. It reports or repairs after the fact, so damage done between sweeps stays (INC-502's duplicates existed until someone closed them).
+
 ### One workspace per writer
 
 - **Source:** Claude Code [worktrees](https://code.claude.com/docs/en/worktrees): "Running each Claude Code session in its own worktree gives it a separate copy of the files to edit"; [Cursor worktrees](https://cursor.com/docs/configuration/worktrees); [Codex worktrees](https://learn.chatgpt.com/docs/environments/git-worktrees), where "Git only allows a branch to be checked out in one place at a time."
 - **Cost:** disk and setup per worktree; Cursor's page gives "The default cap is 25 worktrees per machine" (as of 2026-11, Cursor docs).
-- **Breaks when:** a shell command writes outside the worktree; the [worktrees page](https://code.claude.com/docs/en/worktrees) says "None of them tracks which files a shell command writes". The worktrees share one `.git`, so parallel creation races on it (INC-519). The tool does not apply the isolation, or drops it on resume (INC-517, INC-518). A worktree placed inside the repository is staged and committed by a later `git add -A`, and "Nothing excludes that path." ([anthropics/claude-code#104013](https://github.com/anthropics/claude-code/issues/104013), INC-521).
+- **Breaks when:** a shell command writes outside the worktree; the [worktrees page](https://code.claude.com/docs/en/worktrees) says "None of them tracks which files a shell command writes". The worktrees share one `.git`, so parallel creation races on it (INC-519). The tool does not apply the isolation, or drops it on resume (INC-517, INC-518). A worktree placed inside the repository is staged and committed by a later `git add -A`, and "Nothing excludes that path." ([anthropics/claude-code#104013](https://github.com/anthropics/claude-code/issues/104013), INC-521); once that commit is pushed, every CI checkout of the branch fails on the stray submodule entry.
 
 ### Serialize CI runs and merges
 
@@ -95,7 +101,7 @@ The rungs run from a rule the agents are told to a design in which only one acto
 
 - **Source:** one operator's practice, the fix for INC-503: the claim is the push that creates the issue's branch, and the server refuses to create a branch that already exists. [Temporal](https://docs.temporal.io/workflow-execution/workflowid-runid) gives the same guarantee for workflow IDs: "there can be at most one Workflow Execution with a given ID running at any point in time".
 - **Cost:** one branch push or one start call per claim.
-- **Breaks when:** the key is not derived the same way by every actor, so two actors claim two names for one issue (INC-514); a path skips the claim, such as a manual run or a step the agent is told to run instead of one that runs for it; a redesign replaces it with check-then-act (as of 2026-10, private audit).
+- **Breaks when:** the key is not derived the same way by every actor, so two actors claim two names for one issue (INC-514); a path skips the claim, such as a manual run or a step the agent is told to run; a redesign replaces it with check-then-act (as of 2026-10, private audit).
 
 ### Give claims an expiry and requeue what a dead run held
 
@@ -115,12 +121,6 @@ The rungs run from a rule the agents are told to a design in which only one acto
 - **Cost:** settings; a re-review on every push.
 - **Breaks when:** two runs of the same app report one check name on one commit; pinning the app does not tell them apart (INC-507), and GitHub's [troubleshooting page](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks) warns that "Using the same job name in multiple workflows can cause ambiguous status check results". The check passes before the reviewer posts, and the merge reads the check, not the finding (INC-504). Auto-merge is armed before the fix is pushed (INC-509). Approval removal runs asynchronously after the push (INC-523). The merge itself cannot be undone; for that, see [irreversible effects](irreversible-effects.md).
 
-### Reconcile outcomes on a schedule
-
-- **Source:** Kubernetes [controllers](https://kubernetes.io/docs/concepts/architecture/controller/): "a control loop is a non-terminating loop that regulates the state of a system", comparing the desired state with the current one and acting on the difference. Applied here, a scheduled job checks outcomes rather than paths: at most one open pull request per issue, no claim without a live run, no "blocked by" link to a closed issue.
-- **Cost:** one scheduled job and the time to write each invariant.
-- **Breaks when:** the invariant is not written, so the loop does not compare it. It reports or repairs after the fact, so damage done between sweeps stays (INC-502's duplicates existed until someone closed them).
-
 ### One writer: a single-threaded agent or a synchronous lead
 
 - **Source:** Cognition, [Don't build multi-agents](https://cognition.com/blog/dont-build-multi-agents) (2025-06): "The simplest way to follow the principles is to just use a single-threaded linear agent"; Anthropic's [multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) (2025-06), where "our lead agents execute subagents synchronously".
@@ -133,6 +133,6 @@ External evidence on this class is incident reports, not measurement. None of th
 
 - **The study of multi-agent failures does not cover shared external state.** MAST annotated "1600+ annotated traces collected across 7 popular MAS frameworks" and grouped failures into 14 modes, with inter-annotator agreement of kappa 0.88 (as of 2025-03, [Cemri et al.](https://arxiv.org/abs/2503.13657)). Its modes are about conversation between agents; none names a race on a repository, a tracker or CI.
 - **A vendor saw duplicated work under a synchronous lead.** Anthropic's research system used about 15 times the tokens of chat, outperformed a single agent by 90.2% on its internal eval, and still had subagents duplicate each other's work when their briefs overlapped (as of 2025-06, [Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system)). That is research, not coding; the post says "most coding tasks involve fewer truly parallelizable tasks than research".
-- **Tool trackers report the workspace form with counts.** One reporter found 13 of 31 resumed subagents writing into the main checkout ([anthropics/claude-code#104928](https://github.com/anthropics/claude-code/issues/104928)); another, "13 failures in 4 repositories between 2026-10-01 and 2026-10-20" from parallel worktree creation ([anthropics/claude-code#104026](https://github.com/anthropics/claude-code/issues/104026)) (as of 2026-10, self-reported).
-- **No public report was found of two AI agents opening duplicate pull requests for one issue.** The search behind this doc (its queries are in the pull request that added it) found that form only in one operator's repositories; the public rows are harness bugs and two platform races on GitLab.
+- **Tool trackers report the workspace form with counts.** One reporter found 13 of 31 resumed subagents writing into the main checkout ([anthropics/claude-code#104928](https://github.com/anthropics/claude-code/issues/104928)); another, "13 failures in 4 repositories between 2026-10-01 and 2026-10-20" from parallel worktree creation ([anthropics/claude-code#104026](https://github.com/anthropics/claude-code/issues/104026)) (as of 2026-10, the reporters' own counts).
+- **No public report was found of two AI agents opening duplicate pull requests for one issue.** The search behind this doc (its queries are in [Osasuwu/jarvis-oss#318](https://github.com/Osasuwu/jarvis-oss/pull/318), the pull request that added it) found that form only in one operator's repositories; the public rows are harness bugs and two platform races on GitLab.
 - **One operator's patches.** In a private audit of 15 incidents of this class, all 3 patches that told the agents what to do were followed by a recurrence. Of 9 mechanical checks, 6 held where they were written, and 5 of those 6 left a sibling path unguarded or moved the defect; 1 recurred and 1 blocked work it should not have. Most were removed in a later rebuild that replaced an atomic claim with check-then-act, so the hold figures are an upper bound (as of 2026-10, private audit). The audit is not verifiable; its 2 private rows are in the dataset as "private, not verifiable".
