@@ -194,6 +194,23 @@ INC-421,llm-as-measuring-instrument,review,pull request,primary,https://github.c
 INC-422,llm-as-measuring-instrument,review,documentation,self-reported,https://github.com/github/awesome-copilot/blob/main/skills/copilot-pr-autopilot/references/09-convergence.md
 INC-423,llm-as-measuring-instrument,review,researcher's write-up,self-reported,https://www.contrastsecurity.com/security-influencers/when-ai-reviewers-cannot-agree
 INC-424,llm-as-measuring-instrument,review,blog post,self-reported,https://dev.to/fole/claude-cli-vs-api-for-code-review-same-model-wildly-different-results-1oai
+INC-450,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/37
+INC-451,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/656
+INC-452,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1260
+INC-453,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1312
+INC-454,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1393
+INC-455,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1707
+INC-456,done-is-not-the-effect,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1780
+INC-457,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/81
+INC-458,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/43
+INC-459,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/181
+INC-460,done-is-not-the-effect,code,issue,private,"private, not verifiable"
+INC-462,done-is-not-the-effect,after-merge,issue,private,"private, not verifiable"
+INC-463,done-is-not-the-effect,after-merge,issue,private,"private, not verifiable"
+INC-464,done-is-not-the-effect,after-merge,pull request,private,"private, not verifiable"
+INC-465,done-is-not-the-effect,after-merge,issue,private,"private, not verifiable"
+INC-466,done-is-not-the-effect,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/1702
+INC-467,done-is-not-the-effect,code,issue,primary,https://github.com/anthropics/claude-code/issues/60451
 INC-550,untrusted-content-steers-the-agent,code,researcher's write-up,primary,https://invariantlabs.ai/blog/mcp-github-vulnerability
 INC-551,untrusted-content-steers-the-agent,code,researcher's write-up,primary,https://generalanalysis.com/blog/supabase-mcp-blog
 INC-552,untrusted-content-steers-the-agent,review,researcher's write-up,primary,https://www.legitsecurity.com/blog/remote-prompt-injection-in-gitlab-duo
