@@ -3,7 +3,7 @@ INC-001,destructive-local-delete,code,issue,primary,https://github.com/anthropic
 INC-002,unconfirmed-history-rewrite,code,issue,primary,https://github.com/anthropics/claude-code/issues/85450
 INC-003,approval-after-effect,code,issue,primary,https://github.com/openai/codex/issues/4969
 INC-004,production-data-loss,code,vendor statement,primary,https://x.com/amasad/status/1946986468586721478
-INC-005,ci-identity-publication,ci,post-mortem,primary,https://nx.dev/blog/s1ngularity-postmortem
+INC-005,untrusted-content-steers-the-agent,ci,post-mortem,primary,https://nx.dev/blog/s1ngularity-postmortem
 INC-006,production-data-loss,code,news report of the operator's account,secondary,https://letsdatascience.com/news/pocketos-founder-reports-ai-agent-deleted-production-databas-8f0213e2
 INC-007,claims-from-plausibility,code,issue,primary,https://github.com/anthropics/claude-code/issues/1501
 INC-008,claims-from-plausibility,review,issue,primary,https://github.com/anthropics/claude-code/issues/22507
@@ -235,3 +235,10 @@ INC-520,shared-state-without-ownership,code,issue,primary,https://github.com/ant
 INC-521,shared-state-without-ownership,ci,issue,primary,https://github.com/anthropics/claude-code/issues/104013
 INC-522,shared-state-without-ownership,after-merge,issue,primary,https://gitlab.com/gitlab-org/gitlab/-/issues/571737
 INC-523,shared-state-without-ownership,merge,issue,primary,https://gitlab.com/gitlab-org/gitlab/-/issues/580182
+INC-550,untrusted-content-steers-the-agent,code,researcher's write-up,primary,https://invariantlabs.ai/blog/mcp-github-vulnerability
+INC-551,untrusted-content-steers-the-agent,code,researcher's write-up,primary,https://generalanalysis.com/blog/supabase-mcp-blog
+INC-552,untrusted-content-steers-the-agent,review,researcher's write-up,primary,https://www.legitsecurity.com/blog/remote-prompt-injection-in-gitlab-duo
+INC-553,untrusted-content-steers-the-agent,review,researcher's write-up,primary,https://www.legitsecurity.com/blog/camoleak-critical-github-copilot-vulnerability-leaks-private-source-code
+INC-554,untrusted-content-steers-the-agent,after-merge,security advisory,primary,https://github.com/aws/aws-toolkit-vscode/security/advisories/GHSA-7g7f-ff96-5gcw
+INC-555,untrusted-content-steers-the-agent,ci,researcher's write-up,primary,https://www.aikido.dev/blog/promptpwnd-github-actions-ai-agents
+INC-556,untrusted-content-steers-the-agent,ci,researcher's write-up,primary,https://adnanthekhan.com/posts/clinejection/
