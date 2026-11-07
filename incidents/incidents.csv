@@ -146,6 +146,34 @@ INC-306,scope-overreach,code,issue,self-reported,https://github.com/anthropics/c
 INC-307,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/ai-replaces-entire-file-instead-of-editing-it/163422
 INC-308,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/unauthorized-changes-by-lazy-agent/164158
 INC-309,scope-overreach,code,issue,self-reported,https://github.com/google-gemini/gemini-cli/issues/29370
+INC-350,world-differs-from-assumed,ci,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/35
+INC-351,world-differs-from-assumed,ci,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/217
+INC-352,world-differs-from-assumed,after-merge,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/180
+INC-353,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/181
+INC-354,world-differs-from-assumed,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/200
+INC-355,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/160
+INC-356,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1012
+INC-357,world-differs-from-assumed,merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1202
+INC-358,world-differs-from-assumed,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1223
+INC-359,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1495
+INC-360,world-differs-from-assumed,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1520
+INC-361,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1565
+INC-362,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1647
+INC-363,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1767
+INC-364,world-differs-from-assumed,code,issue,primary,https://github.com/Osasuwu/jarvis/issues/1774
+INC-365,world-differs-from-assumed,merge,pull request,primary,https://github.com/Osasuwu/jarvis/pull/1849
+INC-366,world-differs-from-assumed,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1572
+INC-367,world-differs-from-assumed,merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1926
+INC-368,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1936
+INC-369,world-differs-from-assumed,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/1951
+INC-370,world-differs-from-assumed,after-merge,pull request,primary,https://github.com/Osasuwu/like-current-song/pull/45
+INC-371,world-differs-from-assumed,after-merge,pull request,primary,https://github.com/Osasuwu/like-current-song/pull/46
+INC-372,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/154
+INC-373,world-differs-from-assumed,merge,issue,private,"private, not verifiable"
+INC-374,world-differs-from-assumed,code,issue,private,"private, not verifiable"
+INC-375,world-differs-from-assumed,review,pull request,private,"private, not verifiable"
+INC-376,world-differs-from-assumed,ci,issue,private,"private, not verifiable"
+INC-377,world-differs-from-assumed,after-merge,issue,private,"private, not verifiable"
 INC-400,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/73
 INC-401,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/86
 INC-402,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/91
@@ -166,6 +194,23 @@ INC-421,llm-as-measuring-instrument,review,pull request,primary,https://github.c
 INC-422,llm-as-measuring-instrument,review,documentation,self-reported,https://github.com/github/awesome-copilot/blob/main/skills/copilot-pr-autopilot/references/09-convergence.md
 INC-423,llm-as-measuring-instrument,review,researcher's write-up,self-reported,https://www.contrastsecurity.com/security-influencers/when-ai-reviewers-cannot-agree
 INC-424,llm-as-measuring-instrument,review,blog post,self-reported,https://dev.to/fole/claude-cli-vs-api-for-code-review-same-model-wildly-different-results-1oai
+INC-450,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/37
+INC-451,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/656
+INC-452,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1260
+INC-453,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1312
+INC-454,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1393
+INC-455,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1707
+INC-456,done-is-not-the-effect,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1780
+INC-457,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/81
+INC-458,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/43
+INC-459,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/181
+INC-460,done-is-not-the-effect,code,issue,private,"private, not verifiable"
+INC-462,done-is-not-the-effect,after-merge,issue,private,"private, not verifiable"
+INC-463,done-is-not-the-effect,after-merge,issue,private,"private, not verifiable"
+INC-464,done-is-not-the-effect,after-merge,pull request,private,"private, not verifiable"
+INC-465,done-is-not-the-effect,after-merge,issue,private,"private, not verifiable"
+INC-466,done-is-not-the-effect,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/1702
+INC-467,done-is-not-the-effect,code,issue,primary,https://github.com/anthropics/claude-code/issues/60451
 INC-500,shared-state-without-ownership,code,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/23
 INC-501,shared-state-without-ownership,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/650
 INC-502,shared-state-without-ownership,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/874
