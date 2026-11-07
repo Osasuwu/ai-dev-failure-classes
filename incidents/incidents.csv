@@ -244,7 +244,7 @@ INC-555,untrusted-content-steers-the-agent,ci,researcher's write-up,primary,http
 INC-556,untrusted-content-steers-the-agent,ci,researcher's write-up,primary,https://adnanthekhan.com/posts/clinejection/
 INC-750,limits-and-cost-unmeasured,ci,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/154
 INC-751,limits-and-cost-unmeasured,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1846
-INC-752,limits-and-cost-unmeasured,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1098
+INC-752,limits-and-cost-unmeasured,after-merge,pull request,primary,https://github.com/Osasuwu/jarvis/pull/930
 INC-753,limits-and-cost-unmeasured,ci,issue,private,"private, not verifiable"
 INC-754,limits-and-cost-unmeasured,ci,issue,private,"private, not verifiable"
 INC-755,limits-and-cost-unmeasured,after-merge,issue,private,"private, not verifiable"
