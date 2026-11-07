@@ -49,7 +49,7 @@ Read these every time, whatever your repo looks like. They apply across classes 
 | [claims-from-plausibility](docs/classes/claims-from-plausibility.md) | ● | ● | ● | ● |  | ● | 17 | 13 | 13 primary, 4 private |
 | [copies-of-one-truth-drift](docs/classes/copies-of-one-truth-drift.md) | ● | ● | ● | ● |  | ● | 35 | 31 | 26 primary, 9 private |
 | [done-is-not-the-effect](docs/classes/done-is-not-the-effect.md) | ● | ● |  | ● |  | ● | 17 | 16 | 12 primary, 5 private |
-| [gate-checks-a-proxy](docs/classes/gate-checks-a-proxy.md) |  |  | ● |  | ● | ● | 16 | 12 | 11 primary, 5 private |
+| [gate-checks-a-proxy](docs/classes/gate-checks-a-proxy.md) |  |  | ● |  | ● | ● | 15 | 11 | 11 primary, 4 private |
 | [llm-as-measuring-instrument](docs/classes/llm-as-measuring-instrument.md) |  |  |  | ● |  | ● | 20 | 15 | 14 primary, 3 self-reported, 3 private |
 | [pattern-matched-boundaries](docs/classes/pattern-matched-boundaries.md) | ● | ● |  | ● | ● | ● | 17 | 6 | 15 primary, 2 private |
 | [proxy-optimisation](docs/classes/proxy-optimisation.md) | ● | ● | ● | ● |  |  | 8 | 5 | 7 primary, 1 private |
