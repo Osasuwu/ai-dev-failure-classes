@@ -146,6 +146,26 @@ INC-306,scope-overreach,code,issue,self-reported,https://github.com/anthropics/c
 INC-307,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/ai-replaces-entire-file-instead-of-editing-it/163422
 INC-308,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/unauthorized-changes-by-lazy-agent/164158
 INC-309,scope-overreach,code,issue,self-reported,https://github.com/google-gemini/gemini-cli/issues/29370
+INC-400,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/73
+INC-401,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/86
+INC-402,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/91
+INC-403,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/106
+INC-404,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/138
+INC-405,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/150
+INC-406,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/165
+INC-407,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/194
+INC-408,llm-as-measuring-instrument,review,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/225
+INC-409,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/228
+INC-410,llm-as-measuring-instrument,review,pull request,primary,https://github.com/Osasuwu/jarvis/pull/963
+INC-411,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/148
+INC-412,llm-as-measuring-instrument,after-merge,issue,private,"private, not verifiable"
+INC-413,llm-as-measuring-instrument,after-merge,issue,private,"private, not verifiable"
+INC-414,llm-as-measuring-instrument,after-merge,issue,private,"private, not verifiable"
+INC-420,llm-as-measuring-instrument,after-merge,pull request,primary,https://github.com/ptr727/ProjectTemplate/pull/608
+INC-421,llm-as-measuring-instrument,review,pull request,primary,https://github.com/radius-project/radius/pull/12017
+INC-422,llm-as-measuring-instrument,review,documentation,self-reported,https://github.com/github/awesome-copilot/blob/main/skills/copilot-pr-autopilot/references/09-convergence.md
+INC-423,llm-as-measuring-instrument,review,researcher's write-up,self-reported,https://www.contrastsecurity.com/security-influencers/when-ai-reviewers-cannot-agree
+INC-424,llm-as-measuring-instrument,review,blog post,self-reported,https://dev.to/fole/claude-cli-vs-api-for-code-review-same-model-wildly-different-results-1oai
 INC-500,shared-state-without-ownership,code,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/23
 INC-501,shared-state-without-ownership,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/650
 INC-502,shared-state-without-ownership,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/874
