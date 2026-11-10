@@ -258,7 +258,7 @@ def fetch_url(url: str) -> str:
     if blob:
         url = f"https://raw.githubusercontent.com/{blob.group(1)}/{blob.group(2)}"
     request = urllib.request.Request(
-        url, headers={"User-Agent": "jarvis-oss check_quotes"}
+        url, headers={"User-Agent": "ai-dev-failure-classes check_quotes"}
     )
     for attempt in range(3):
         try:

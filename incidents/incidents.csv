@@ -9,9 +9,9 @@ INC-007,claims-from-plausibility,code,issue,primary,https://github.com/anthropic
 INC-008,claims-from-plausibility,review,issue,primary,https://github.com/anthropics/claude-code/issues/22507
 INC-009,claims-from-plausibility,code,issue,primary,https://github.com/anthropics/claude-code/issues/46940
 INC-010,claims-from-plausibility,after-merge,researcher's write-up,primary,https://www.lasso.security/blog/ai-package-hallucinations
-INC-011,claims-from-plausibility,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/61
-INC-012,claims-from-plausibility,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/63
-INC-013,claims-from-plausibility,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/216
+INC-011,claims-from-plausibility,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/61
+INC-012,claims-from-plausibility,review,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/63
+INC-013,claims-from-plausibility,review,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/216
 INC-014,claims-from-plausibility,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/651
 INC-015,claims-from-plausibility,review,pull request,primary,https://github.com/Osasuwu/jarvis/pull/1839
 INC-016,claims-from-plausibility,review,pull request,primary,https://github.com/Osasuwu/music-intel-mcp/pull/152
@@ -33,14 +33,14 @@ INC-031,pattern-matched-boundaries,code,security advisory,primary,https://github
 INC-032,pattern-matched-boundaries,code,researcher's write-up,primary,https://embracethered.com/blog/posts/2025/github-copilot-remote-code-execution-via-prompt-injection/
 INC-033,pattern-matched-boundaries,code,security advisory,primary,https://github.com/advisories/GHSA-mmgp-wc2j-qcv7
 INC-034,pattern-matched-boundaries,code,security advisory,primary,https://github.com/advisories/GHSA-ff64-7w26-62rf
-INC-035,pattern-matched-boundaries,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/92
-INC-036,pattern-matched-boundaries,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/232
-INC-037,pattern-matched-boundaries,task,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/233
+INC-035,pattern-matched-boundaries,review,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/92
+INC-036,pattern-matched-boundaries,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/232
+INC-037,pattern-matched-boundaries,task,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/233
 INC-038,pattern-matched-boundaries,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1967
 INC-039,pattern-matched-boundaries,review,issue,private,"private, not verifiable"
 INC-040,pattern-matched-boundaries,merge,issue,private,"private, not verifiable"
-INC-041,absence-read-as-success,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/74
-INC-042,absence-read-as-success,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/214
+INC-041,absence-read-as-success,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/74
+INC-042,absence-read-as-success,review,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/214
 INC-043,absence-read-as-success,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/326
 INC-044,absence-read-as-success,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1073
 INC-045,absence-read-as-success,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1109
@@ -66,7 +66,7 @@ INC-100,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osas
 INC-101,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/372
 INC-102,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1426
 INC-103,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1942
-INC-105,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/191
+INC-105,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/191
 INC-106,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/83
 INC-107,tests-that-cannot-fail,review,pull request,primary,https://github.com/Osasuwu/music-intel-mcp/pull/177
 INC-108,tests-that-cannot-fail,after-merge,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/227
@@ -77,9 +77,9 @@ INC-112,tests-that-cannot-fail,after-merge,issue,private,"private, not verifiabl
 INC-113,tests-that-cannot-fail,after-merge,issue,private,"private, not verifiable"
 INC-114,tests-that-cannot-fail,after-merge,issue,private,"private, not verifiable"
 INC-115,tests-that-cannot-fail,ci,issue,private,"private, not verifiable"
-INC-150,copies-of-one-truth-drift,after-merge,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/71
-INC-151,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/72
-INC-152,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/231
+INC-150,copies-of-one-truth-drift,after-merge,pull request,primary,https://github.com/Osasuwu/ai-dev-failure-classes/pull/71
+INC-151,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/72
+INC-152,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/231
 INC-153,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/284
 INC-154,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1218
 INC-155,copies-of-one-truth-drift,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1220
@@ -133,8 +133,8 @@ INC-251,proxy-optimisation,code,issue,primary,https://github.com/anthropics/clau
 INC-252,proxy-optimisation,code,issue,primary,https://github.com/anthropics/claude-code/issues/41350
 INC-253,proxy-optimisation,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/652
 INC-254,proxy-optimisation,review,pull request,primary,https://github.com/Osasuwu/jarvis/pull/1011
-INC-255,proxy-optimisation,ci,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/78
-INC-256,proxy-optimisation,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/64
+INC-255,proxy-optimisation,ci,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/78
+INC-256,proxy-optimisation,review,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/64
 INC-257,proxy-optimisation,review,pull request,private,"private, not verifiable"
 INC-300,scope-overreach,review,pull request,primary,https://github.com/taskforcesh/nandu/pull/71
 INC-301,scope-overreach,after-merge,pull request,primary,https://github.com/DSTech-876/Trading-Web/pull/380
@@ -146,12 +146,12 @@ INC-306,scope-overreach,code,issue,self-reported,https://github.com/anthropics/c
 INC-307,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/ai-replaces-entire-file-instead-of-editing-it/163422
 INC-308,scope-overreach,after-merge,forum post,self-reported,https://forum.cursor.com/t/unauthorized-changes-by-lazy-agent/164158
 INC-309,scope-overreach,code,issue,self-reported,https://github.com/google-gemini/gemini-cli/issues/29370
-INC-350,world-differs-from-assumed,ci,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/35
-INC-351,world-differs-from-assumed,ci,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/217
-INC-352,world-differs-from-assumed,after-merge,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/180
-INC-353,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/181
-INC-354,world-differs-from-assumed,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/200
-INC-355,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/160
+INC-350,world-differs-from-assumed,ci,pull request,primary,https://github.com/Osasuwu/ai-dev-failure-classes/pull/35
+INC-351,world-differs-from-assumed,ci,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/217
+INC-352,world-differs-from-assumed,after-merge,pull request,primary,https://github.com/Osasuwu/ai-dev-failure-classes/pull/180
+INC-353,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/181
+INC-354,world-differs-from-assumed,review,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/200
+INC-355,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/160
 INC-356,world-differs-from-assumed,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1012
 INC-357,world-differs-from-assumed,merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1202
 INC-358,world-differs-from-assumed,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1223
@@ -174,16 +174,16 @@ INC-374,world-differs-from-assumed,code,issue,private,"private, not verifiable"
 INC-375,world-differs-from-assumed,review,pull request,private,"private, not verifiable"
 INC-376,world-differs-from-assumed,ci,issue,private,"private, not verifiable"
 INC-377,world-differs-from-assumed,after-merge,issue,private,"private, not verifiable"
-INC-400,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/73
-INC-401,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/86
-INC-402,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/91
-INC-403,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/106
-INC-404,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/138
-INC-405,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/150
-INC-406,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/165
-INC-407,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/194
-INC-408,llm-as-measuring-instrument,review,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/225
-INC-409,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/228
+INC-400,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/73
+INC-401,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/86
+INC-402,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/91
+INC-403,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/106
+INC-404,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/138
+INC-405,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/150
+INC-406,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/165
+INC-407,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/194
+INC-408,llm-as-measuring-instrument,review,pull request,primary,https://github.com/Osasuwu/ai-dev-failure-classes/pull/225
+INC-409,llm-as-measuring-instrument,review,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/228
 INC-410,llm-as-measuring-instrument,review,pull request,primary,https://github.com/Osasuwu/jarvis/pull/963
 INC-411,llm-as-measuring-instrument,after-merge,issue,primary,https://github.com/Osasuwu/like-current-song/issues/148
 INC-412,llm-as-measuring-instrument,after-merge,issue,private,"private, not verifiable"
@@ -194,7 +194,7 @@ INC-421,llm-as-measuring-instrument,review,pull request,primary,https://github.c
 INC-422,llm-as-measuring-instrument,review,documentation,self-reported,https://github.com/github/awesome-copilot/blob/main/skills/copilot-pr-autopilot/references/09-convergence.md
 INC-423,llm-as-measuring-instrument,review,researcher's write-up,self-reported,https://www.contrastsecurity.com/security-influencers/when-ai-reviewers-cannot-agree
 INC-424,llm-as-measuring-instrument,review,blog post,self-reported,https://dev.to/fole/claude-cli-vs-api-for-code-review-same-model-wildly-different-results-1oai
-INC-450,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/37
+INC-450,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/37
 INC-451,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/656
 INC-452,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1260
 INC-453,done-is-not-the-effect,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1312
@@ -211,7 +211,7 @@ INC-464,done-is-not-the-effect,after-merge,pull request,private,"private, not ve
 INC-465,done-is-not-the-effect,after-merge,issue,private,"private, not verifiable"
 INC-466,done-is-not-the-effect,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/1702
 INC-467,done-is-not-the-effect,code,issue,primary,https://github.com/anthropics/claude-code/issues/60451
-INC-500,shared-state-without-ownership,code,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/23
+INC-500,shared-state-without-ownership,code,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/23
 INC-501,shared-state-without-ownership,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/650
 INC-502,shared-state-without-ownership,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/874
 INC-503,shared-state-without-ownership,review,issue,primary,https://github.com/Osasuwu/jarvis/issues/931
@@ -242,13 +242,13 @@ INC-553,untrusted-content-steers-the-agent,review,researcher's write-up,primary,
 INC-554,untrusted-content-steers-the-agent,after-merge,security advisory,primary,https://github.com/aws/aws-toolkit-vscode/security/advisories/GHSA-7g7f-ff96-5gcw
 INC-555,untrusted-content-steers-the-agent,ci,researcher's write-up,primary,https://www.aikido.dev/blog/promptpwnd-github-actions-ai-agents
 INC-556,untrusted-content-steers-the-agent,ci,researcher's write-up,primary,https://adnanthekhan.com/posts/clinejection/
-INC-600,gate-checks-a-proxy,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/53
+INC-600,gate-checks-a-proxy,after-merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/53
 INC-601,gate-checks-a-proxy,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1351
 INC-602,gate-checks-a-proxy,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1550
 INC-603,gate-checks-a-proxy,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/993
 INC-604,gate-checks-a-proxy,ci,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/133
-INC-605,gate-checks-a-proxy,merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/213
-INC-606,gate-checks-a-proxy,ci,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/195
+INC-605,gate-checks-a-proxy,merge,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/213
+INC-606,gate-checks-a-proxy,ci,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/195
 INC-607,gate-checks-a-proxy,after-merge,issue,private,"private, not verifiable"
 INC-608,gate-checks-a-proxy,after-merge,issue,private,"private, not verifiable"
 INC-610,gate-checks-a-proxy,after-merge,issue,private,"private, not verifiable"
@@ -270,8 +270,8 @@ INC-659,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/a
 INC-660,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/anthropics/claude-code/issues/92998
 INC-661,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/openai/codex/issues/43075
 INC-662,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/openai/codex/issues/37955
-INC-700,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/102
-INC-701,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/159
+INC-700,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/102
+INC-701,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/ai-dev-failure-classes/issues/159
 INC-702,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1134
 INC-703,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1154
 INC-704,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1796
@@ -280,7 +280,7 @@ INC-706,spec-not-grounded-in-current-state,task,pull request,primary,https://git
 INC-707,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1856
 INC-708,spec-not-grounded-in-current-state,review,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/205
 INC-709,spec-not-grounded-in-current-state,review,pull request,private,"private, not verifiable"
-INC-750,limits-and-cost-unmeasured,ci,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/154
+INC-750,limits-and-cost-unmeasured,ci,pull request,primary,https://github.com/Osasuwu/ai-dev-failure-classes/pull/154
 INC-751,limits-and-cost-unmeasured,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1846
 INC-752,limits-and-cost-unmeasured,after-merge,pull request,primary,https://github.com/Osasuwu/jarvis/pull/930
 INC-753,limits-and-cost-unmeasured,ci,issue,private,"private, not verifiable"

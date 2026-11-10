@@ -101,7 +101,8 @@ def fetch_status(url: str) -> int:
     HostNotFound. Raises SignInRedirect when the redirects end on a sign-in page, whatever it
     answered. Other failures propagate, a temporary lookup failure among them."""
     request = urllib.request.Request(
-        url, headers={"User-Agent": "jarvis-oss check_links", "Accept": "*/*"}
+        url,
+        headers={"User-Agent": "ai-dev-failure-classes check_links", "Accept": "*/*"},
     )
     for attempt in range(2):
         try:
