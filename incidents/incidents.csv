@@ -257,3 +257,16 @@ INC-612,gate-checks-a-proxy,after-merge,researcher's write-up,primary,https://la
 INC-613,gate-checks-a-proxy,after-merge,commit,primary,https://bazel.googlesource.com/continuous-integration/+/d464ae8a58fa3589bc5dea2533782cf30ec52985
 INC-614,gate-checks-a-proxy,merge,researcher's write-up,primary,https://airman604.substack.com/p/bypassing-github-branch-protection
 INC-615,gate-checks-a-proxy,after-merge,changelog,primary,https://github.blog/changelog/2023-06-06-security-enhancements-to-required-approvals-on-pull-requests/
+INC-650,knowledge-not-at-point-of-action,code,issue,primary,https://github.com/Osasuwu/jarvis/issues/653
+INC-651,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/657
+INC-652,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/660
+INC-653,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1097
+INC-654,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1512
+INC-655,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1735
+INC-656,knowledge-not-at-point-of-action,ci,issue,private,"private, not verifiable"
+INC-657,knowledge-not-at-point-of-action,code,issue,primary,https://github.com/Osasuwu/like-current-song/issues/161
+INC-658,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/anthropics/claude-code/issues/95745
+INC-659,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/anthropics/claude-code/issues/92949
+INC-660,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/anthropics/claude-code/issues/92998
+INC-661,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/openai/codex/issues/43075
+INC-662,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/openai/codex/issues/37955
