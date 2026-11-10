@@ -242,6 +242,55 @@ INC-553,untrusted-content-steers-the-agent,review,researcher's write-up,primary,
 INC-554,untrusted-content-steers-the-agent,after-merge,security advisory,primary,https://github.com/aws/aws-toolkit-vscode/security/advisories/GHSA-7g7f-ff96-5gcw
 INC-555,untrusted-content-steers-the-agent,ci,researcher's write-up,primary,https://www.aikido.dev/blog/promptpwnd-github-actions-ai-agents
 INC-556,untrusted-content-steers-the-agent,ci,researcher's write-up,primary,https://adnanthekhan.com/posts/clinejection/
+INC-600,gate-checks-a-proxy,after-merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/53
+INC-601,gate-checks-a-proxy,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1351
+INC-602,gate-checks-a-proxy,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1550
+INC-603,gate-checks-a-proxy,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/993
+INC-604,gate-checks-a-proxy,ci,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/133
+INC-605,gate-checks-a-proxy,merge,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/213
+INC-606,gate-checks-a-proxy,ci,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/195
+INC-607,gate-checks-a-proxy,after-merge,issue,private,"private, not verifiable"
+INC-608,gate-checks-a-proxy,after-merge,issue,private,"private, not verifiable"
+INC-610,gate-checks-a-proxy,after-merge,issue,private,"private, not verifiable"
+INC-611,gate-checks-a-proxy,ci,issue,private,"private, not verifiable"
+INC-612,gate-checks-a-proxy,after-merge,researcher's write-up,primary,https://labs.boostsecurity.io/articles/split-second-side-doors-how-bot-delegated-toctou-breaks-the-cicd-threat-model
+INC-613,gate-checks-a-proxy,after-merge,commit,primary,https://bazel.googlesource.com/continuous-integration/+/d464ae8a58fa3589bc5dea2533782cf30ec52985
+INC-614,gate-checks-a-proxy,merge,researcher's write-up,primary,https://airman604.substack.com/p/bypassing-github-branch-protection
+INC-615,gate-checks-a-proxy,after-merge,changelog,primary,https://github.blog/changelog/2023-06-06-security-enhancements-to-required-approvals-on-pull-requests/
+INC-650,knowledge-not-at-point-of-action,code,issue,primary,https://github.com/Osasuwu/jarvis/issues/653
+INC-651,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/657
+INC-652,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/660
+INC-653,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1097
+INC-654,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1512
+INC-655,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/Osasuwu/jarvis/issues/1735
+INC-656,knowledge-not-at-point-of-action,ci,issue,private,"private, not verifiable"
+INC-657,knowledge-not-at-point-of-action,code,issue,primary,https://github.com/Osasuwu/like-current-song/issues/161
+INC-658,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/anthropics/claude-code/issues/95745
+INC-659,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/anthropics/claude-code/issues/92949
+INC-660,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/anthropics/claude-code/issues/92998
+INC-661,knowledge-not-at-point-of-action,task,issue,primary,https://github.com/openai/codex/issues/43075
+INC-662,knowledge-not-at-point-of-action,after-merge,issue,primary,https://github.com/openai/codex/issues/37955
+INC-700,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/102
+INC-701,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis-oss/issues/159
+INC-702,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1134
+INC-703,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1154
+INC-704,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1796
+INC-705,spec-not-grounded-in-current-state,code,issue,primary,https://github.com/Osasuwu/jarvis/issues/1815
+INC-706,spec-not-grounded-in-current-state,task,pull request,primary,https://github.com/Osasuwu/jarvis/pull/1843
+INC-707,spec-not-grounded-in-current-state,task,issue,primary,https://github.com/Osasuwu/jarvis/issues/1856
+INC-708,spec-not-grounded-in-current-state,review,issue,primary,https://github.com/Osasuwu/music-intel-mcp/issues/205
+INC-709,spec-not-grounded-in-current-state,review,pull request,private,"private, not verifiable"
+INC-750,limits-and-cost-unmeasured,ci,pull request,primary,https://github.com/Osasuwu/jarvis-oss/pull/154
+INC-751,limits-and-cost-unmeasured,ci,issue,primary,https://github.com/Osasuwu/jarvis/issues/1846
+INC-752,limits-and-cost-unmeasured,after-merge,pull request,primary,https://github.com/Osasuwu/jarvis/pull/930
+INC-753,limits-and-cost-unmeasured,ci,issue,private,"private, not verifiable"
+INC-754,limits-and-cost-unmeasured,ci,issue,private,"private, not verifiable"
+INC-755,limits-and-cost-unmeasured,after-merge,issue,private,"private, not verifiable"
+INC-756,limits-and-cost-unmeasured,task,issue,private,"private, not verifiable"
+INC-757,limits-and-cost-unmeasured,after-merge,pull request,primary,https://github.com/github/gh-aw/pull/29932
+INC-758,limits-and-cost-unmeasured,after-merge,pull request,primary,https://github.com/github/gh-aw/pull/35789
+INC-759,limits-and-cost-unmeasured,review,pull request,primary,https://github.com/encodium/.github/pull/123
+INC-760,limits-and-cost-unmeasured,ci,pull request,primary,https://github.com/github/gh-aw-firewall/pull/4082
 INC-800,destructive-op-on-computed-target,code,issue,self-reported,https://github.com/anthropics/claude-code/issues/12637
 INC-801,destructive-op-on-computed-target,code,issue,primary,https://github.com/anthropics/claude-code/issues/76208
 INC-802,destructive-op-on-computed-target,code,issue,self-reported,https://github.com/anthropics/claude-code/issues/82471
